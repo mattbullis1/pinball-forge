@@ -8,7 +8,7 @@ Install Node.js, run `npm install`, then `npm run dev`. To build static files fo
 
 ## Create a table
 
-Click or drag a component from the visual parts tray onto the playfield. Drag a wall endpoint to reshape the wall; drag the wall body to move it. Select a part and use Quick Paint to recolor it. Open Paint / Tune for exact color, position, rotation, or score controls, and for table surface and wall colors. Snap to grid can be turned off. New creates a starter table; Sample tables provides three examples. Test plays the current table without changing the editor data.
+Click or drag a component from the visual parts tray onto the playfield. Drag a wall endpoint to reshape the wall; drag the wall body to move it. The perimeter is made of connected wall segments, so moving its vertices changes the table silhouette and collision shape. Select a part and use Quick Paint to recolor it. Open Paint / Tune for exact color, position, rotation, or score controls, and for table surface and wall colors. Snap to grid can be turned off. New creates a starter table; Sample tables provides three examples. Test plays the current table without changing the editor data.
 
 ## Save and open
 

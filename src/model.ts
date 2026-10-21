@@ -1,5 +1,5 @@
 export type Kind = 'wall'|'bumper'|'leftFlipper'|'rightFlipper'|'launcher'|'slingshot'|'target'|'rollover'|'drain'|'light'|'zone'|'ball';
-export type Part = { id:string; kind:Kind; x:number; y:number; x2?:number; y2?:number; r?:number; color:string; score:number; rotation:number };
+export type Part = { id:string; kind:Kind; x:number; y:number; x2?:number; y2?:number; r?:number; color:string; score:number; rotation:number; boundary?:boolean };
 export type Table = { id:string; title:string; surface:string; wallColor:string; parts:Part[] };
 export const W=560, H=840;
 export const palette: {kind:Kind;label:string;group:string;icon:string}[] = [
@@ -17,8 +17,10 @@ export function makePart(kind:Kind,x:number,y:number):Part {
   return {id:`p${Date.now().toString(36)}${++counter}`,kind,x,y,...(kind==='wall'?{x2:x+100,y2:y}:{}),r:kind==='bumper'?30:kind==='ball'?11:kind==='light'?12:24,color:colors[kind],score:['bumper','target','slingshot','rollover','zone'].includes(kind)?100:0,rotation:0};
 }
 function base(title:string,surface:string,wallColor:string):Table {
-  const parts=[makePart('wall',24,28),makePart('wall',24,28),makePart('wall',536,28),makePart('wall',24,800),makePart('wall',414,800),makePart('drain',280,812),makePart('leftFlipper',206,720),makePart('rightFlipper',354,720),makePart('launcher',508,748),makePart('ball',507,692)];
-  Object.assign(parts[0],{x2:536,y2:28});Object.assign(parts[1],{x2:24,y2:800});Object.assign(parts[2],{x2:536,y2:800});Object.assign(parts[3],{x2:230,y2:800});Object.assign(parts[4],{x2:536,y2:800});
+  const outline:[[number,number],...Array<[number,number]>]=[[70,25],[465,25],[518,95],[520,265],[495,340],[518,560],[520,780],[350,806],[210,806],[42,780],[35,590],[62,405],[35,275],[38,115]];
+  const parts:Part[]=outline.map(([x,y],i)=>{const [x2,y2]=outline[(i+1)%outline.length];const p=makePart('wall',x,y);Object.assign(p,{x2,y2,boundary:true,color:wallColor});return p});
+  parts.splice(7,1); // The gap at the foot of the table is the ball drain.
+  parts.push(makePart('drain',280,812),makePart('leftFlipper',206,720),makePart('rightFlipper',354,720),makePart('launcher',508,748),makePart('ball',507,692));
   return {id:uid(),title,surface,wallColor,parts};
 }
 export function sampleTables():Table[] {
