@@ -1,6 +1,6 @@
 # PINBALL FORGE
 
-A browser-based pinball construction set. Phase 1 is a playable editor preview.
+A browser-based pinball construction set. Phase 1 is a playable editor preview inspired by the original's black playfield, bright parts tray, and immediate click-to-build feel. All current graphics are original Canvas drawings.
 
 ## Run locally
 

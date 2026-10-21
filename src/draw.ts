@@ -1,14 +1,13 @@
 import {H,Part,Table,W} from './model';
 export function drawTable(ctx:CanvasRenderingContext2D,t:Table,selected?:string,ball?:{x:number;y:number},score=0,testing=false){
-  ctx.clearRect(0,0,W,H);ctx.fillStyle=t.surface;ctx.fillRect(0,0,W,H);
-  const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#ffffff0b');g.addColorStop(.5,'#00000000');g.addColorStop(1,'#00000044');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  ctx.strokeStyle='#ffffff0b';ctx.lineWidth=1;for(let x=40;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=40;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#ff56d8';ctx.fillRect(0,0,W,H);ctx.fillStyle=t.surface;ctx.fillRect(16,16,W-32,H-32);
+  ctx.strokeStyle='#f4f4ef';ctx.lineWidth=3;ctx.strokeRect(18,18,W-36,H-36);
   for(const p of t.parts)drawPart(ctx,p,p.id===selected,t.wallColor);
   if(ball){ctx.beginPath();ctx.arc(ball.x,ball.y,11,0,Math.PI*2);const m=ctx.createRadialGradient(ball.x-4,ball.y-5,1,ball.x,ball.y,12);m.addColorStop(0,'white');m.addColorStop(.45,'#cbd7df');m.addColorStop(1,'#556977');ctx.fillStyle=m;ctx.fill();ctx.strokeStyle='#ffffffaa';ctx.stroke()}
   if(testing){ctx.fillStyle='#07101aba';ctx.fillRect(12,12,168,48);ctx.fillStyle='#e7fbff';ctx.font='bold 19px system-ui';ctx.fillText(`SCORE ${score}`,23,43)}
 }
 function drawPart(c:CanvasRenderingContext2D,p:Part,selected:boolean,wallColor:string){
-  c.save();c.shadowColor=p.color;c.shadowBlur=p.kind==='light'?25:9;c.lineCap='round';c.lineJoin='round';
+  c.save();c.shadowColor=p.color;c.shadowBlur=p.kind==='light'?16:0;c.lineCap='square';c.lineJoin='miter';
   if(p.kind==='wall'){
     c.strokeStyle=p.color||wallColor;c.lineWidth=9;c.beginPath();c.moveTo(p.x,p.y);c.lineTo(p.x2??p.x+100,p.y2??p.y);c.stroke();c.strokeStyle='#ffffff88';c.lineWidth=2;c.stroke();
     if(selected){for(const [x,y] of [[p.x,p.y],[p.x2??p.x+100,p.y2??p.y]]){c.fillStyle='#fff';c.beginPath();c.arc(x,y,8,0,7);c.fill()}}c.restore();return;

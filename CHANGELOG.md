@@ -4,3 +4,4 @@
 
 - Added isolated TypeScript/Vite project and Git repository.
 - Added Canvas editor, component palette, wall endpoint editing, table themes, properties, Undo/Redo, local saving, three sample tables, and initial Matter.js Test mode.
+- Reworked the editor around the original construction set's playfield-and-parts-tray arrangement and cyan, magenta, white, and black visual language.
