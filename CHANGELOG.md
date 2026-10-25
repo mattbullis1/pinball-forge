@@ -7,3 +7,16 @@
 - Reworked the editor around the original construction set's playfield-and-parts-tray arrangement and cyan, magenta, white, and black visual language.
 - Rebuilt the construction screen as a two-panel workbench with original drawn part icons, quick paint swatches, and a hidden Paint / Tune drawer.
 - Added a connected, mouse-adjustable playfield perimeter that changes the visible table shape and collision walls.
+
+## 0.2.0 — Faithful workbench revision (2026-10-25)
+
+- Implemented accepted table/parts-box/tool-strip design with original green/purple procedural graphics.
+- Added Hand, Move corner, Add corner, Remove corner, and Paint tools.
+- Added solid polygons, concave collisions, shared renderer/physics geometry, and invalid-shape feedback.
+- Added 20 working presets, mirrored slingshots, supported resizing, alignment, pointer drag/drop, and tap placement.
+- Made whole drags atomic in undo/redo; protected perimeter connectivity and drain endpoints.
+- Added side scoreboard, Back to Build, restart, default hit sound/flash, and fixed 120 Hz stepping; all placed flippers respond.
+- Added browser-save/file-open choices and stronger project validation.
+- Verified 21 tests, production build, and browser workflows. Exported data stayed byte-identical across Test.
+- Preserved web server/example.test configuration. No deployment performed.
+- Later phases, including standalone ZIP and imported animation, remain pending.
