@@ -4,6 +4,14 @@ The owner accepted an Apple II-inspired static proposal, then authorized impleme
 
 ## References
 
+## Latest owner review — 2026-10-26
+
+The header/top menu, right-side tool/color column and pop-in menus are approved and locked. Changes to those areas require explicit owner permission. See the project AGENTS.md.
+
+The owner says the game works similarly but its graphics are off. The current procedural component artwork has not met the requested faithful-recreation standard. Next design work should compare a single chosen original presentation with the actual component silhouettes, proportions, pixel treatment, colors, table surface and scoreboard. Review a visual proposal before implementing changes. Phase 6 is not automatically authorized by this feedback.
+
+### Reference sources
+
 - [Bill Budge demonstration, 2:35 onward](https://www.youtube.com/watch?v=EOayMrdTax4&t=155s): parts box, joystick hand, immediate play and return to editing.
 - [Apple II construction session](https://www.youtube.com/watch?v=i9-VSDrz3GQ): green/purple presentation and assembly.
 - [ADG walkthrough, 9:40 onward](https://www.youtube.com/watch?v=R46Cj21c_Bc&t=580s): polygon tools and painting in the PC port.

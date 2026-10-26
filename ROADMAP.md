@@ -1,5 +1,7 @@
 # Roadmap
 
+**Current review priority:** the user approved and locked the header/menu, right-side color/tool column and pop-in menus, but rejected the current degree of graphics fidelity. Prepare a reference-matched visual proposal before further feature phases or a graphics redesign. See AGENTS.md and docs/FAITHFUL-WORKBENCH.md. No application code changes authorized by this design discussion.
+
 - Phase 0: research and architecture recommendation — previously reviewed.
 - Phase 1: faithful construction revision — implemented for user review. Wall sculpting, solid obstacles, painting, three samples, browser/file saving, undo/redo, and Test. Physical tablet testing and a committed UI regression suite remain outstanding.
 - Phase 2: artwork and animation implemented for review — raster import, native GIF/WebP, sprite sheets/sequences, roles/layers, IndexedDB, original animated parts, and optional polished rendering. Physical tablet and Firefox/Safari coverage remain unverified; standalone animation verification belongs to Phase 4.
