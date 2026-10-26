@@ -20,3 +20,14 @@
 - Verified 21 tests, production build, and browser workflows. Exported data stayed byte-identical across Test.
 - Preserved web server/example.test configuration. No deployment performed.
 - Later phases, including standalone ZIP and imported animation, remain pending.
+
+## 0.3.0 — Artwork and animation (2026-10-25)
+
+- Added PNG/JPG/WebP/GIF imports, file dropping, artwork placement, scaling, rotation, opacity, layers, and decoration/obstacle/target roles.
+- Added native GIF/WebP animation, sprite grids and image sequences, with three original animated parts.
+- Added optional polished materials, chrome pinballs, illuminated bumpers and capped hit particles; Classic remains the default.
+- Migrated new browser saves to IndexedDB while retaining legacy-save reading. Project downloads embed image data.
+- Added asset validation, decode-before-load checks, import totals/errors, and rectangle collision guides.
+- Fixed compound-contact duplicate scoring and frame-sequence cropping; added regression tests.
+- Added opt-in performance measurements and a self-contained Star Workshop editing example.
+- Standalone ZIP, advanced rules and full physics refinement remain later phases.

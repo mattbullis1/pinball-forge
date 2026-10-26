@@ -14,6 +14,19 @@ Test receives a cloned table. Editing controls are disabled or hidden during pla
 
 ## Persistence and deployment
 
-Current projects use localStorage for one browser save and validated JSON interchange. IndexedDB is reserved for later asset storage. Vite emits static files with relative paths. Development access is through example.test on port 5173; web server and all existing sites remain unchanged.
+Projects use IndexedDB for one browser save, with read-only fallback to the earlier localStorage save. JSON interchange embeds raster image bytes as data URLs. Vite emits static files with relative paths. Development access is through example.test on port 5173; web server and all existing sites remain unchanged.
 
-The future standalone player should consume the same model, geometry, renderer, and rules using a separate entry point with bundled assets/licenses. This revision does not implement ZIP generation, imported animation, community hosting, or backend services.
+The future standalone player should consume the same model, geometry, renderer, and rules using a separate entry point with bundled assets/licenses. This revision does not implement ZIP generation, community hosting, or backend services.
+
+## Phase 2 modules
+
+- art-model.ts: asset records, artwork roles, sprite timing/cropping and import validation. Assets only accept embedded PNG/JPEG/WebP/GIF; external URLs and SVG are excluded.
+- artwork.ts: native image decoding, original generated sprite sheets, and reusable DOM artwork layers. A surface Canvas sits under the back artwork layer, the component/ball Canvas above it, then optional front overlays. Transparent artwork never determines physics implicitly.
+- art-ui.ts: file/drop import, reusable artwork tiles, dimensions, opacity, role, layer and animation properties. Image bytes are shared by reference ID in project data, not repeated for each placed part.
+- polished.ts: original Canvas materials, shadows, highlights, lights and a capped 80-particle hit pool. Classic keeps its original half-resolution drawing buffer.
+- storage.ts: IndexedDB transaction completion before confirming Save, plus legacy-save reading. All project loading validates the model and decodes images before replacement.
+- diagnostics.ts: opt-in local QA through ?diagnostics; render duration, frame intervals and available JavaScript heap readings are exposed on canvas data attributes. No telemetry.
+
+Sprite updates only change image styles when the frame changes. Native GIF/WebP retain original disposal and timing through browser image rendering. Sprite sheets and sequences use one animation loop; hidden-document sprite work pauses. During play, artwork layout is stable and only hit feedback changes. The same transformed rectangle feeds artwork hit testing and Matter collisions. Compound contacts are deduplicated per collision event.
+
+JSON/base64 and snapshot history are intentionally simple but can consume substantial memory with large artwork collections. Native GIF/WebP cannot be precisely synchronized or paused through this implementation. The separate player must reuse the layer and asset modules; exported-game compatibility is still a Phase 4 test gate.

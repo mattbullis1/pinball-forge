@@ -7,7 +7,7 @@ export function shape(p:Part):Point[]{
   if(p.kind==='obstacle')return (p.points??[]).map(v=>transform(p,v));
   if(p.kind==='slingshot')return [{x:-22,y:-40},{x:24,y:40},{x:-22,y:22}].map(v=>transform(p,v));
   if(p.kind==='leftFlipper'||p.kind==='rightFlipper'){const d=p.kind==='leftFlipper'?1:-1;return [{x:-6,y:-10},{x:82*d,y:-4},{x:92*d,y:3},{x:0,y:11}].map(v=>transform(p,v))}
-  const w=p.kind==='launcher'?9:p.kind==='drain'?38:23,h=p.kind==='launcher'?32:p.kind==='drain'?7:13;
+  const w=p.kind==='artwork'?(p.art?.width??80)/2:p.kind==='launcher'?9:p.kind==='drain'?38:23,h=p.kind==='artwork'?(p.art?.height??80)/2:p.kind==='launcher'?32:p.kind==='drain'?7:13;
   return [{x:-w,y:-h},{x:w,y:-h},{x:w,y:h},{x:-w,y:h}].map(v=>transform(p,v));
 }
 export function perimeter(t:Table):Point[]{const out:Point[]=[];for(const p of t.parts.filter(p=>p.boundary)){if(!out.length||!same(out[out.length-1],p))out.push({x:p.x,y:p.y});out.push(end(p))}if(out.length>1&&same(out[0],out[out.length-1]))out.pop();return out}

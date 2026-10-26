@@ -1,10 +1,12 @@
+import {Asset,Artwork,validAsset,validArt} from './art-model';
 import { validGeometry } from './geometry';
-export type Kind = 'wall'|'obstacle'|'bumper'|'leftFlipper'|'rightFlipper'|'launcher'|'slingshot'|'target'|'rollover'|'drain'|'light'|'zone'|'ball';
+export type Kind = 'artwork'|'wall'|'obstacle'|'bumper'|'leftFlipper'|'rightFlipper'|'launcher'|'slingshot'|'target'|'rollover'|'drain'|'light'|'zone'|'ball';
 export type Point = {x:number;y:number};
-export type Part = {id:string;kind:Kind;x:number;y:number;x2?:number;y2?:number;r?:number;color:string;score:number;rotation:number;boundary?:boolean;points?:Point[];scale?:number;mirror?:boolean};
-export type Table = {id:string;title:string;surface:string;wallColor:string;exterior?:string;parts:Part[]};
+export type Part = {id:string;kind:Kind;x:number;y:number;x2?:number;y2?:number;r?:number;color:string;score:number;rotation:number;boundary?:boolean;points?:Point[];scale?:number;mirror?:boolean;art?:Artwork};
+export type Table = {id:string;title:string;surface:string;wallColor:string;exterior?:string;parts:Part[];assets?:Record<string,Asset>;theme?:'classic'|'polished'};
 export const W=560,H=840;
 export const palette:{kind:Kind;label:string;group:string;icon:string}[]=[
+{kind:'artwork',label:'Artwork',group:'Decoration',icon:'▧'},
 {kind:'leftFlipper',label:'Left flipper',group:'Controls',icon:'◢'},{kind:'rightFlipper',label:'Right flipper',group:'Controls',icon:'◣'},
 {kind:'ball',label:'Pinball',group:'Controls',icon:'●'},{kind:'launcher',label:'Launcher',group:'Controls',icon:'↟'},
 {kind:'wall',label:'Wall guide',group:'Shapes',icon:'╱'},{kind:'obstacle',label:'Solid obstacle',group:'Shapes',icon:'▰'},
@@ -42,7 +44,9 @@ const c=newTable('Electric Avenue');c.exterior=colors[5];c.parts.filter(p=>p.bou
 export function validateTable(value:unknown):value is Table{
 if(!value||typeof value!=='object')return false;const t=value as Table,hex=(v:unknown)=>typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v);
 if(typeof t.id!=='string'||typeof t.title!=='string'||t.title.length>100||!hex(t.surface)||!hex(t.wallColor)||t.exterior!==undefined&&!hex(t.exterior)||!Array.isArray(t.parts)||t.parts.length>1000)return false;
-const ids=new Set<string>();for(const p of t.parts){if(!p||typeof p.id!=='string'||ids.has(p.id)||!palette.some(k=>k.kind===p.kind)||![p.x,p.y,p.rotation,p.score].every(Number.isFinite)||p.score<0||p.score>1e9||!hex(p.color))return false;ids.add(p.id);
+if(t.theme!==undefined&&!['classic','polished'].includes(t.theme))return false;
+if(t.assets!==undefined&&(!t.assets||typeof t.assets!=='object'||Array.isArray(t.assets)||Object.entries(t.assets).some(([id,a])=>!validAsset(a)||a.id!==id)))return false;
+const ids=new Set<string>();for(const p of t.parts){if(!p||typeof p.id!=='string'||ids.has(p.id)||!palette.some(k=>k.kind===p.kind)||![p.x,p.y,p.rotation,p.score].every(Number.isFinite)||p.score<0||p.score>1e9||!hex(p.color))return false;ids.add(p.id);if(p.kind==='artwork'&&!validArt(p.art!,t.assets??{}))return false;
 if(p.scale!==undefined&&(!Number.isFinite(p.scale)||p.scale<.4||p.scale>2))return false;if(p.r!==undefined&&(!Number.isFinite(p.r)||p.r<3||p.r>100))return false;
 if(p.boundary!==undefined&&typeof p.boundary!=='boolean'||p.boundary&&p.kind!=='wall')return false;
 if(p.kind==='wall'&&![p.x2,p.y2].every(Number.isFinite))return false;

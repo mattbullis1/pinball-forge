@@ -1,6 +1,6 @@
 # PINBALL FORGE
 
-A browser construction set inspired by Bill Budge's Apple II workbench: table on the left, parts box on the right, and direct manipulation with a mouse or touch. This is the approved faithful-workbench preview, not a completed implementation of every roadmap phase.
+A browser construction set inspired by Bill Budge's Apple II workbench: table on the left, parts box on the right, and direct manipulation with a mouse or touch. The faithful workbench now includes Phase 2 artwork and animation. Later roadmap phases remain separate approval gates.
 
 ## Run on development machine
 
@@ -31,8 +31,20 @@ Physics is still a prototype awaiting Phase 3 refinement. Advanced components an
 
 **Save** stores one project in this browser on this device. **Open** offers that save or a file picker. **Project ↓** downloads an editable `.pinball.json` file. Imported projects are validated before replacing the table. Use files for durable copies and transfer between devices; browser storage is origin/device-specific and may be cleared.
 
-Project files are not standalone games. HTML5 ZIP export is planned for Phase 4. Custom artwork, GIF/WebP/sprite animation, IndexedDB asset storage, and exported-game publishing are not implemented yet.
+Project files include their image and animation bytes. Browser saves use IndexedDB; older localStorage saves remain readable and are not deleted. Project files are not standalone games. HTML5 ZIP export and independent/offline player verification remain Phase 4.
+
+## Artwork and animation
+
+1. Choose **Artwork +**. Import PNG, JPG, WebP, or GIF files; alternatively drop files onto the playfield.
+2. Drag an artwork tile onto the table, or click it to place it and then move it with Hand. Three original animated parts are included: warning beacon, energy field, and spacecraft.
+3. Select the artwork and choose **Adjust**. Set width, height, rotation, opacity, and layer. **Fit artwork to playfield** makes a background. Front overlays can cover the ball; the default layer keeps components and the ball visible above artwork.
+4. Artwork starts as **Decoration only**. Choose **Physical obstacle** or **Interactive target** for collision; targets default to 100 points. The dashed rectangle shows the collision boundary, including transparent pixels. Image outlines are not traced automatically.
+5. GIF and animated WebP play natively where the browser supports them. For sprite sheets, expand **Sprite sheet / animation**, enter columns, rows, frame count and speed, then apply. Frames run left to right, top to bottom. **Import frame sequence** combines several images in file-picker order.
+6. **Table → Appearance** switches between Classic (default) and Polished. Polished adds metallic flippers, chrome balls, lit bumpers, surface shading and hit particles. The construction layout stays familiar.
+7. Save, reopen, and use **Project ↓** to transfer the complete editable table with its artwork. Try [Star Workshop](examples/star-workshop.pinball.json) through Open → Choose project file.
+
+Native GIF/WebP timing is controlled by the browser; frame-specific gameplay synchronization uses sprite sheets or frame sequences. Large assets can exhaust browser memory/storage. No image files are uploaded to a service. Imported images retain their original bytes; storage errors are reported without discarding the editing table.
 
 ## Review
 
-See [the actual workbench](docs/faithful-workbench.jpg), [interaction decisions](docs/FAITHFUL-WORKBENCH.md), and [test evidence](TESTING.md).
+See [the Phase 2 workbench](docs/phase2-workbench.jpg), [the Classic workbench](docs/faithful-workbench.jpg), [interaction decisions](docs/FAITHFUL-WORKBENCH.md), and [test evidence](TESTING.md).
