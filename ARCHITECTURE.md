@@ -5,12 +5,14 @@
 - `geometry.ts` supplies transforms, mirrored shapes, hit detection, connected-boundary operations, validity checks, and triangle decomposition. Rendering and Matter bodies use the same polygon points.
 - `draw.ts` draws original procedural components through a half-resolution buffer for vintage edges. Palette thumbnails use the same functions.
 - `history.ts` stores up to 80 independent snapshots. A pointer gesture records only its completed transaction; cancellation restores its starting snapshot.
-- `physics.ts` uses Matter.js at 120 Hz. Concave obstacles become compound convex bodies; geometry decomposition does not replace Matter's physics. Flipper transforms are shared with rendering. Decoration is excluded from collisions.
+- `physics.ts` owns a 120 Hz accumulator with four fixed Matter.js substeps per tick. Concave obstacles become compound convex bodies; convex parts use one hull to avoid internal seams. Geometry decomposition does not replace Matter's physics. Flipper transforms and their contact velocities match the rendered pivot and angle. Decoration is excluded from collisions.
 - `workbench.css` supplies the responsive two-column workbench, tool strip, property drawer, and scoreboard.
 
 Outer walls are ordered segments with one intentional drain gap. The visible surface closes that gap for filling only; physics adds no wall across it. Neighboring boundary endpoints move together. Corner operations preserve ordering. Crossed, collapsed, and out-of-bounds polygon shapes are rejected.
 
-Test receives a cloned table. Editing controls are disabled or hidden during play; no Matter bodies enter saved project data. Pointer cancellation and window blur release controls. Simulation catch-up work is capped after browser stalls.
+The runtime clones its input table. Editing controls are disabled or hidden during play; no Matter bodies enter saved project data. `play-input.ts` tracks independent keyboard, button and pointer sources so releasing one finger cannot release another held input. Window blur and document hiding pause simulation; Resume is explicit. Simulation catch-up is capped at 100 ms after stalls.
+
+The runtime owns serving/launch eligibility, three-ball drains, restart, pause, score and contact history. One launch is allowed per served ball; after it leaves the starting area, an unlaunched free ball also enters play. Contact sets deduplicate compound collisions and prevent occupied sensors from repeatedly scoring. A 100 ms award interval suppresses contact chatter. Bumper/slingshot impulses preserve tangential velocity. Ball speed is capped at 36 Matter velocity units. A read-only snapshot supplies player state and optional diagnostics; the runtime has no DOM, storage, audio or editor dependency.
 
 ## Persistence and deployment
 

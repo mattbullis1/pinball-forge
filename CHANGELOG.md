@@ -31,3 +31,14 @@
 - Fixed compound-contact duplicate scoring and frame-sequence cropping; added regression tests.
 - Added opt-in performance measurements and a self-contained Star Workshop editing example.
 - Standalone ZIP, advanced rules and full physics refinement remain later phases.
+
+## 0.4.0 — Playable physics refinement (2026-10-25)
+
+- Retained Matter.js and shared project geometry; added an internal 120 Hz accumulator with four fixed collision substeps per tick and bounded ball speed.
+- Replaced scripted flipper kicks with contact response from the actual pivot motion. Convex components now avoid artificial triangle seams.
+- Added outward bumper/slingshot reactions, per-contact scoring, and chatter suppression.
+- Limited launching to a fresh ball; unified restart, pause, game-over and three-ball rules in the reusable runtime.
+- Added Pause/Resume and automatic pause on focus loss, plus independent keyboard/touch input sources.
+- Verified 51 automated checks, four 30-second simulation runs, real browser scoring/drain/restart/pause workflows and byte-identical animated-project preservation.
+- Recorded simulation CPU measurements and browser diagnostics. Physical tablet, Firefox/Safari, arbitrary extreme layouts and standalone player verification remain future checks.
+- No dependencies added, no deployment, and no web server or example.test configuration changes.

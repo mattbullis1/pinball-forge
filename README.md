@@ -25,7 +25,9 @@ Shortcuts: H Hand; V Move corner; A Add corner; X Remove corner; P Paint. Ctrl/C
 
 **Test** replaces the parts box with the scoreboard. Left/Right Shift operate flippers; Space launches. Touch controls are provided. Scoring parts have default points, synthesized sound, and a brief hit flash. Test uses a cloned table, a fixed 120 Hz simulation, and shared renderer/physics geometry. **Back to Build** preserves editing data. Restart starts another three-ball game.
 
-Physics is still a prototype awaiting Phase 3 refinement. Advanced components and multiball remain future work. Placing a ball currently relocates the single starting ball.
+Phase 3 uses motion-driven flipper contacts, fixed simulation substeps, outward bumper/slingshot impulses, and contact-based scoring. Each fresh ball launches once; pressing Space during play does not kick it again. Pause/Resume preserves the ball; switching away from the window or hiding the page pauses automatically. Restart clears the score and restores three balls. Touch flipper buttons support independent held inputs. Placing a ball relocates the single starting ball; advanced components and multiball remain future work.
+
+This is an arcade pinball model, with bounded ball speed for collision stability. It does not simulate cabinet tilt, coil forces or full electromechanical pinball. See [Phase 3 design and acceptance](docs/PHASE3.md). The standalone player will reuse this runtime in Phase 4.
 
 ## Save and open
 
@@ -47,4 +49,4 @@ Native GIF/WebP timing is controlled by the browser; frame-specific gameplay syn
 
 ## Review
 
-See [the Phase 2 workbench](docs/phase2-workbench.jpg), [the Classic workbench](docs/faithful-workbench.jpg), [interaction decisions](docs/FAITHFUL-WORKBENCH.md), and [test evidence](TESTING.md).
+See [the Phase 3 playtest](docs/phase3-playtest.jpg), [the Phase 2 workbench](docs/phase2-workbench.jpg), [the Classic workbench](docs/faithful-workbench.jpg), [interaction decisions](docs/FAITHFUL-WORKBENCH.md), and [test evidence](TESTING.md).

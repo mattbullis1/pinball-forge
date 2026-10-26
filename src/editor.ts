@@ -4,9 +4,10 @@ import {addCorner,end,inside,moveVertex,perimeter,project,removeCorner,shape,tra
 import {History} from './history';
 import {drawTable,drawThumbnail,drawBackground} from './draw';
 import {createGame,Game} from './physics';
+import {FlipperInput} from './play-input';
 import {ArtworkLayers,checkArtwork} from './artwork';
 import {artworkControls,artworkProperties} from './art-ui';
-import {measureRender} from './diagnostics';
+import {measureRender,measureSimulation} from './diagnostics';
 import {saveProject,loadProject} from './storage';
 type Mode='hand'|'corner'|'add'|'cut'|'paint';
 const modeInfo:Record<Mode,[string,string,string]>={
@@ -20,7 +21,7 @@ const app=document.querySelector<HTMLDivElement>('#app')!;
 app.innerHTML=`<header><h1>PINBALL FORGE</h1><nav aria-label="Project"><button id="new">New</button><button id="open">Open</button><button id="save">Save</button><button id="undo">Undo</button><button id="redo">Redo</button><button id="test">▶ Test</button><button id="export" title="Download an editable project file">Project ↓</button></nav></header>
 <main><section class="stage" aria-label="Pinball table"><div class="table-heading"><span id="table-title"></span><button id="settings" aria-label="Table settings">Table ▾</button></div><div class="canvas-wrap"><canvas id="background" width="560" height="840" aria-hidden="true"></canvas><div id="art-back" class="art-layer" aria-hidden="true"></div><canvas id="canvas" width="560" height="840" tabindex="0" aria-label="Pinball construction playfield"></canvas><div id="art-front" class="art-layer" aria-hidden="true"></div></div><div id="touch-play" hidden><button id="left">Left flipper</button><button id="launch">Launch</button><button id="right">Right flipper</button></div></section>
 <section class="workbox" aria-label="Parts and tools"><div class="parts-area"><div id="build-box"><div class="box-heading"><span>PARTS BOX</span><label class="snap"><input type="checkbox" id="snap" checked> Snap</label></div><div id="parts" aria-label="Component palette"></div><div id="part-help">Take a part. Put it on the table.</div><button id="artwork">Artwork +</button><div id="selection" class="selection"><strong id="selection-name">Your construction set</strong><div id="selection-actions" hidden><button id="tune">Adjust</button><button id="duplicate">Duplicate</button><button id="delete">Delete</button></div><p id="selection-help">Shape the walls. Add a few parts. Try it.</p></div><details id="accessible-parts"><summary>Select a part by name</summary><label>Table parts<select id="part-list"><option value="">Choose a part</option></select></label></details></div>
-<div id="scoreboard" hidden aria-label="Playtest scoreboard"><p class="small">PINBALL FORGE</p><h2 id="game-title"></h2><div class="score-label">SCORE</div><output id="score">00000000</output><div class="score-label">BALLS</div><output id="balls">● ● ●</output><p id="game-state">Make something. Play something.</p><button id="restart">Restart game</button><button id="back">Back to Build</button><p class="instructions">LEFT SHIFT · RIGHT SHIFT<br>SPACE TO LAUNCH</p><label><input type="checkbox" id="sound" checked> Sound</label></div></div>
+<div id="scoreboard" hidden aria-label="Playtest scoreboard"><p class="small">PINBALL FORGE</p><h2 id="game-title"></h2><div class="score-label">SCORE</div><output id="score">00000000</output><div class="score-label">BALLS</div><output id="balls">● ● ●</output><p id="game-state">Make something. Play something.</p><button id="pause">Pause</button><button id="restart">Restart game</button><button id="back">Back to Build</button><p class="instructions">LEFT SHIFT · RIGHT SHIFT<br>SPACE TO LAUNCH</p><label><input type="checkbox" id="sound" checked> Sound</label></div></div>
 <nav class="tools" aria-label="Construction tools">${Object.entries(modeInfo).map(([mode,[label,,path]])=>`<button data-mode="${mode}" title="${label}" aria-label="${label}">${icon(path)}<span>${label}</span></button>`).join('')}<div id="swatches" aria-label="Paint colors">${colors.map((c,i)=>`<button data-color="${c}" aria-label="${['White','Green','Purple','Orange','Cyan','Magenta','Black'][i]} paint" title="${['White','Green','Purple','Orange','Cyan','Magenta','Black'][i]}" style="--swatch:${c}"></button>`).join('')}</div><label class="custom-paint" title="Choose another paint color">Color<input id="custom-color" type="color" value="#a042ff" aria-label="Custom paint color"></label><button id="tool-test" aria-label="Test table" title="Test table">${icon('M6 3l15 9-15 9z')}<span>Test</span></button></nav></section></main>
 <footer><span id="status" role="status"></span><span id="mode-label">BUILD</span></footer>
 <aside id="inspector" hidden aria-label="Adjust selection"><button id="close-inspector" aria-label="Close adjustments">×</button><h2 id="inspector-title">Adjust</h2><div id="properties"></div></aside>
@@ -35,7 +36,8 @@ const artworkLayers=new ArtworkLayers($('#art-back'),$('#art-front'));
 const artHooks={table:()=>table,commit,select:(id:string)=>{selected=id;chosen=undefined;mode='hand';refresh()},message:(s:string)=>{message(s);toast(s)},busy:()=>!!game};
 const artControls=artworkControls(canvas,artHooks);
 $('#artwork').addEventListener('click',()=>artControls.open());
-const history=new History();let game:Game|undefined,raf=0,left=false,right=false;
+const history=new History();let game:Game|undefined,raf=0;
+const playInput=new FlipperInput((left,right)=>game?.flippers(left,right));
 let drag:{before:Table;origin:Point;id:string;vertex?:Vertex;pointer:number}|undefined;
 let paletteDrag:{preset:string;start:Point;pointer:number}|undefined;
 let toastTimer:ReturnType<typeof setTimeout>;
@@ -44,7 +46,7 @@ const current=()=>table.parts.find(p=>p.id===selected);
 const corners=()=>['corner','add','cut'].includes(mode);
 function message(text:string){$('#status').textContent=text}
 function toast(text:string){clearTimeout(toastTimer);$('#toast').textContent=text;$('#toast').classList.add('show');toastTimer=setTimeout(()=>$('#toast').classList.remove('show'),3200)}
-function paintCanvas(updateArtwork=true){const started=performance.now();if(updateArtwork)artworkLayers.sync(table,selected,!!game,game?.flash());else artworkLayers.flash(game?.flash());drawTable(ctx,table,{selected,corners:corners(),invalid,guides,testing:!!game,gameParts:game?.parts(),ball:game?.ball(),flash:game?.flash()});if(game){$('#score').textContent=String(game.score()).padStart(8,'0');$('#balls').textContent='● '.repeat(game.balls())||'—';$('#game-state').textContent=game.balls()?'LEFT SHIFT / RIGHT SHIFT · SPACE':'GAME OVER'}measureRender(canvas,started,!!game)}
+function paintCanvas(updateArtwork=true){const started=performance.now();if(updateArtwork)artworkLayers.sync(table,selected,!!game,game?.flash());else artworkLayers.flash(game?.flash());drawTable(ctx,table,{selected,corners:corners(),invalid,guides,testing:!!game,gameParts:game?.parts(),ball:game?.ball(),flash:game?.flash()});if(game){$('#score').textContent=String(game.score()).padStart(8,'0');$('#balls').textContent='● '.repeat(game.balls())||'—';const state=game.snapshot();$('#game-state').textContent=state.state==='gameover'?'GAME OVER — restart to play again':state.state==='paused'?'PAUSED — Resume when ready':state.canLaunch?'SPACE OR LAUNCH TO START':'LEFT SHIFT / RIGHT SHIFT · FLIPPERS';$('#pause').textContent=state.state==='paused'?'Resume':'Pause';$<HTMLButtonElement>('#pause').disabled=state.state==='gameover';$<HTMLButtonElement>('#launch').disabled=!state.canLaunch;for(const id of ['left','right'])$<HTMLButtonElement>('#'+id).disabled=state.state==='paused'||state.state==='gameover'}measureRender(canvas,started,!!game)}
 function refresh(){
  drawBackground(backgrounds,table);canvas.classList.toggle('polished',table.theme==='polished');paintCanvas();$('#table-title').textContent=table.title;$<HTMLButtonElement>('#undo').disabled=!!game||!history.past.length;$<HTMLButtonElement>('#redo').disabled=!!game||!history.future.length;
  document.querySelectorAll<HTMLButtonElement>('button[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode&&!chosen)));
@@ -136,19 +138,39 @@ $('#export').addEventListener('click',()=>{const url=URL.createObjectURL(new Blo
 let audio:AudioContext|undefined;
 function sound(score:number){if(!$<HTMLInputElement>('#sound').checked||!audio)return;const oscillator=audio.createOscillator(),gain=audio.createGain();oscillator.type='square';oscillator.frequency.setValueAtTime(score?660:330,audio.currentTime);oscillator.frequency.exponentialRampToValueAtTime(180,audio.currentTime+.09);gain.gain.setValueAtTime(.025,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.1);oscillator.connect(gain).connect(audio.destination);oscillator.start();oscillator.stop(audio.currentTime+.1)}
 function playUI(on:boolean){if(on)artControls.close();$('#build-box').hidden=on;$('#scoreboard').hidden=!on;$('#touch-play').hidden=!on;$('.tools').hidden=on;$('#inspector').hidden=true;$('#test').textContent=on?'■ Back to Build':'▶ Test';for(const id of ['new','open','settings'])$<HTMLButtonElement>('#'+id).disabled=on;$('#game-title').textContent=table.title;refresh()}
-function startTest(){if(game)return;finishDrag();left=right=false;chosen=undefined;try{audio??=new AudioContext();void audio.resume()}catch{/* Play also works without audio. */}game=createGame(structuredClone(table),()=>{},sound);playUI(true);message('Left Shift / Right Shift: flippers · Space: launch · Escape: back to build');let last=performance.now(),acc=0;const loop=(now:number)=>{if(!game)return;acc+=Math.min(now-last,100);last=now;while(acc>=1000/120){game.step(1000/120);acc-=1000/120}paintCanvas(false);raf=requestAnimationFrame(loop)};raf=requestAnimationFrame(loop)}
-function stopTest(){if(!game)return;cancelAnimationFrame(raf);game.stop();game=undefined;left=right=false;playUI(false);message('Back to building — your table is exactly as you left it')}
-$('#test').addEventListener('click',()=>game?stopTest():startTest());$('#tool-test').addEventListener('click',startTest);$('#back').addEventListener('click',stopTest);$('#restart').addEventListener('click',()=>{stopTest();startTest()});
-for(const id of ['left','right','launch']){const b=$<HTMLButtonElement>('#'+id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(id==='launch')game?.launch();if(id==='left')left=true;if(id==='right')right=true;game?.flippers(left,right)});const release=()=>{if(id==='left')left=false;if(id==='right')right=false;game?.flippers(left,right)};b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release)}
-window.addEventListener('blur',()=>{left=right=false;game?.flippers(false,false);finishDrag(true)});
+function startTest(){
+ if(game)return;finishDrag();playInput.clear();chosen=undefined;
+ try{audio??=new AudioContext();void audio.resume()}catch{/* Silent play remains available. */}
+ game=createGame(table,()=>{},sound);playUI(true);canvas.focus();
+ message('Left Shift / Right Shift: flippers · Space: launch · Escape: back to build');
+ let last=performance.now();
+ const loop=(now:number)=>{if(!game)return;const started=performance.now();game.step(now-last);last=now;measureSimulation(canvas,started,game);paintCanvas(false);raf=requestAnimationFrame(loop)};
+ raf=requestAnimationFrame(loop);
+}
+function stopTest(){if(!game)return;cancelAnimationFrame(raf);playInput.clear();game.stop();game=undefined;playUI(false);message('Back to building — your table is exactly as you left it')}
+function pauseTest(paused:boolean){if(!game||game.balls()===0)return;playInput.clear();game.pause(paused);if(!paused){void audio?.resume();canvas.focus()}paintCanvas(false)}
+$('#test').addEventListener('click',()=>game?stopTest():startTest());$('#tool-test').addEventListener('click',startTest);$('#back').addEventListener('click',stopTest);
+$('#restart').addEventListener('click',()=>{playInput.clear();game?.restart();void audio?.resume();canvas.focus();paintCanvas(false)});
+$('#pause').addEventListener('click',()=>pauseTest(game?.snapshot().state!=='paused'));
+for(const id of ['left','right','launch'] as const){
+ const b=$<HTMLButtonElement>('#'+id);
+ b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);if(id==='launch')game?.launch();else playInput.press('pointer-'+e.pointerId,id)});
+ const release=(e:PointerEvent)=>playInput.release('pointer-'+e.pointerId);
+ b.addEventListener('pointerup',release);b.addEventListener('pointercancel',release);b.addEventListener('lostpointercapture',release);
+ b.addEventListener('keydown',e=>{if(e.code!=='Space'&&e.code!=='Enter')return;e.preventDefault();e.stopPropagation();if(!e.repeat){if(id==='launch')game?.launch();else playInput.press('button-'+id,id)}});
+ b.addEventListener('keyup',e=>{if(e.code!=='Space'&&e.code!=='Enter')return;e.preventDefault();e.stopPropagation();playInput.release('button-'+id)});
+ b.addEventListener('blur',()=>playInput.release('button-'+id));
+}
+window.addEventListener('blur',()=>{pauseTest(true);finishDrag(true)});
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pauseTest(true)});
 document.addEventListener('keydown',e=>{
  if((e.target as HTMLElement).matches('input,select,textarea')||document.querySelector('dialog[open]'))return;
- if(game){if(e.code==='ShiftLeft')left=true;if(e.code==='ShiftRight')right=true;if(e.code==='Space'){e.preventDefault();if(!e.repeat)game.launch()}if(e.key==='Escape')stopTest();game?.flippers(left,right);return}
+ if(game){if(e.code==='ShiftLeft')playInput.press('key-left','left');if(e.code==='ShiftRight')playInput.press('key-right','right');if(e.code==='Space'){e.preventDefault();if(!e.repeat)game.launch()}if(e.key==='Escape')stopTest();return}
  if(e.key==='Escape'){artControls.close();finishDrag(true);chosen=undefined;selected=undefined;$('#inspector').hidden=true;setMode('hand')}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redo():undo()}
  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();redo()}
  if(e.key==='Delete'||e.key==='Backspace'){e.preventDefault();removeSelected()}
  const keys:Record<string,Mode>={h:'hand',v:'corner',a:'add',x:'cut',p:'paint'};if(!e.ctrlKey&&!e.metaKey&&keys[e.key.toLowerCase()])setMode(keys[e.key.toLowerCase()]);
 });
-document.addEventListener('keyup',e=>{if(e.code==='ShiftLeft')left=false;if(e.code==='ShiftRight')right=false;game?.flippers(left,right)});
+document.addEventListener('keyup',e=>{if(e.code==='ShiftLeft')playInput.release('key-left');if(e.code==='ShiftRight')playInput.release('key-right')});
 message(modeInfo.hand[1]);refresh();

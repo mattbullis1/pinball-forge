@@ -1,5 +1,37 @@
 # Testing
 
+## Phase 3 verification — 2026-10-25
+
+**51 automated tests pass** across four files; TypeScript and Vite production build pass. Added 22 physics/input checks to the previous 29. The test suite covers:
+
+- Equivalent elapsed-time outcomes at 30/60/120/144 Hz, invalid deltas and bounded stall recovery.
+- Maximum-speed ball contacts against 4-unit walls at 0°, 25°, 65° and 90°, plus a scaled thin drain sensor.
+- Left/right flipper strikes, held flippers remaining passive, rotated/scaled flippers, release and velocity bounds.
+- Launch eligibility, rotated launcher direction, missing ball marker, three-ball game-over and complete restart state.
+- Sensor exit/re-entry scoring, a target resting contact without score farming, and outward bumper/slingshot reactions.
+- Independent keyboard/touch sources and pause/resume state preservation.
+- Three samples plus a table with a sculpted boundary, moved bumper and resized flippers: **four 30-second simulations**, finite bounded motion and unchanged source tables.
+
+### Browser verification
+
+On the actual example.test preview in the in-app Chromium browser:
+
+- Played Classic Builder and animated Star Workshop; observed 100-point scoring, draining and the next ball waiting to launch.
+- Confirmed ShiftLeft, ShiftRight and Space key events reach the game. Pointer Launch worked; launch disables during active play.
+- Paused a moving ball, compared its complete diagnostic snapshot later, and found it unchanged; resumed through the button.
+- Opened the dedicated drain-check fixture, observed all three balls drain to GAME OVER, then clicked Restart and verified three balls, zero score and ready state.
+- Returned from Star Workshop Test and downloaded the editable project. SHA-256 exactly matched the original example: 31c023a48bf7d46749bf66a49653f5d34e9b625dd7d71190674c6e7711d9fad0. Artwork and all table data survived unchanged.
+- Inspected 768×1024 layout: document width 768, touch button heights 44 pixels, no horizontal overflow. Reset the viewport afterward.
+- Captured docs/phase3-playtest.jpg and docs/phase3-gameover.jpg. No browser warnings/errors were returned in the final log check. Browser saves were not overwritten during Phase 3 testing.
+
+### Performance and practical limits
+
+Run node tests/measure-physics.mjs to repeat the simulation-only CPU measurement. Results are saved in docs/phase3-performance.json. Each sample ran 1,800 display-frame calls (30 simulated seconds); p95 simulation time was 0.148 ms Classic Builder, 0.098 ms Star Cadet, and 0.045 ms Electric Avenue. This excludes rendering, asset decoding, audio and browser scheduling.
+
+One mixed-playtest browser diagnostic window, ending on Star Workshop, measured 1.90 ms p95 simulation work per rendered frame, 0.90 ms p95 rendering and approximately 9 MB JS heap. It also recorded 82 pauses longer than 500 ms under browser automation/occlusion, so it does **not** establish a stable interactive frame rate. Heap excludes native image/GPU allocations. Physical tablet input, another network device, Firefox/Safari and large custom tables remain unverified.
+
+This is an arcade model with fixed substeps and bounded speeds, not exact continuous collision detection or electromechanical pinball. The future standalone player must reuse physics.ts and its lifecycle rules; ZIP/export parity belongs to Phase 4. Network configuration and existing web server sites are unchanged.
+
 ## Phase 2 verification — 2026-10-25
 
 `npm test`: **29 tests passed** in three files. `npm run build`: TypeScript and Vite production build passed. Added tests cover embedded image preservation, role validation, external/missing asset rejection, opacity/dimension/frame validation, frame timing, sequence-versus-sheet cropping, rotated artwork geometry, and decoration/obstacle/target physics. Existing construction and physics checks still pass.
@@ -70,4 +102,4 @@ These browser checks used the browser-control tool, not a committed Playwright r
 
 Verified example.test resolved to development machine's private address. Existing web server AOV returned HTTP 200. No DNS, hosts, firewall, Apache, authentication, or network settings changed.
 
-Later gates: standalone ZIP generation, independent exported-game and offline tests, broad browser/device coverage, large-asset stress tests, and detailed physics tuning. Do not describe these as complete.
+Later gates: standalone ZIP generation, independent exported-game and offline tests, broad browser/device coverage, large-asset stress tests, and further device-specific physics tuning. Do not describe these as complete.

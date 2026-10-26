@@ -13,3 +13,7 @@ This revision uses original procedural pixel-style drawings and locally synthesi
 ## Phase 2 artwork
 
 The metallic/light materials, spacecraft, energy field, warning beacon, Star Workshop table, and small test fixtures are original procedural work under the repository MIT license. No historical screenshots, commercial pinball artwork, or downloaded stock assets are bundled. No new runtime or development dependencies were added for Phase 2. User-imported files retain their own licensing; importing them does not grant redistribution rights. Native browser image playback and IndexedDB require no paid APIs or services.
+
+## Phase 3 runtime
+
+Physics continues to use the existing MIT-licensed Matter.js dependency. The control, lifecycle, fixed-step integration, test fixtures and measurement script are original project code under this repository's MIT license. No additional dependencies or third-party assets were introduced.
