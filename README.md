@@ -25,7 +25,7 @@ Shortcuts: H Hand; V Move corner; A Add corner; X Remove corner; P Paint. Ctrl/C
 
 **Test** replaces the parts box with the scoreboard. Left/Right Shift operate flippers; Space launches. Touch controls are provided. Scoring parts have default points, synthesized sound, and a brief hit flash. Test uses a cloned table, a fixed 120 Hz simulation, and shared renderer/physics geometry. **Back to Build** preserves editing data. Restart starts another three-ball game.
 
-Phase 3 uses motion-driven flipper contacts, fixed simulation substeps, outward bumper/slingshot impulses, and contact-based scoring. Each fresh ball launches once; pressing Space during play does not kick it again. Pause/Resume preserves the ball; switching away from the window or hiding the page pauses automatically. Restart clears the score and restores three balls. Touch flipper buttons support independent held inputs. Placing a ball relocates the single starting ball; advanced components and multiball remain future work.
+Phase 3 uses motion-driven flipper contacts, fixed simulation substeps, outward bumper/slingshot impulses, and contact-based scoring. Each fresh ball launches once; pressing Space during play does not kick it again. Pause/Resume preserves the ball; switching away from the window or hiding the page pauses automatically. Restart clears the score and restores three balls. Touch flipper buttons support independent held inputs. Placing a ball relocates the single starting ball; optional multiball gates add two active balls during a turn.
 
 This is an arcade pinball model, with bounded ball speed for collision stability. It does not simulate cabinet tilt, coil forces or full electromechanical pinball. See [Phase 3 design and acceptance](docs/PHASE3.md). The standalone player reuses this exact runtime.
 
@@ -33,7 +33,7 @@ This is an arcade pinball model, with bounded ball speed for collision stability
 
 **Save** stores one project in this browser on this device. **Open** offers that save or a file picker. **Project ↓** downloads an editable `.pinball.json` file. Imported projects are validated before replacing the table. Use files for durable copies and transfer between devices; browser storage is origin/device-specific and may be cleared.
 
-Project files include their image and animation bytes. Browser saves use IndexedDB; older localStorage saves remain readable and are not deleted. Project files are editable documents. Use DOWNLOAD MY PINBALL GAME to package a standalone player.
+Project files include their image, animation and audio bytes. Browser saves use IndexedDB; older localStorage saves remain readable and are not deleted. Project files are editable documents. Use DOWNLOAD MY PINBALL GAME to package a standalone player.
 
 ## Artwork and animation
 
@@ -56,8 +56,17 @@ Native GIF/WebP timing is controlled by the browser; frame-specific gameplay syn
 5. Choose Play. Use Shift keys or the touch buttons, Space/Launch, Pause, Restart and Fullscreen.
 6. To publish on hosting you control, upload all extracted contents into one directory, preserving filenames. Keep LICENSES.txt and any notices required by imported artwork. Publishing is a user action; this project has not been publicly deployed.
 
-The ZIP includes images, animation settings, the physics engine, shared game rules and locally synthesized sounds. Keep **Project ↓** backups to continue editing. See [Phase 4 verification and limits](docs/PHASE4.md).
+The ZIP includes images, animation settings, the physics engine, shared game rules, locally synthesized sounds and imported audio. Keep **Project ↓** backups to continue editing. See [Phase 4 verification and limits](docs/PHASE4.md).
 
 ## Review
 
 See [the Phase 3 playtest](docs/phase3-playtest.jpg), [the Phase 2 workbench](docs/phase2-workbench.jpg), [the Classic workbench](docs/faithful-workbench.jpg), [interaction decisions](docs/FAITHFUL-WORKBENCH.md), and [test evidence](TESTING.md).
+
+
+## Optional Advanced workshop
+
+Choose **Advanced +** for multiball gates, flat animated boost ramps, moving obstacles, drop targets, magnets, spinners, timed bonuses and extra balls. Drag a part onto the table, or choose it then click a destination. Classic opens with this panel hidden.
+
+Choose a trigger and an action under **When a part is hit**, then **Add rule**. Several rules can share a trigger. Add optional combo scoring or a mission with target checkboxes. Import local WAV/MP3/Ogg/WebM files for looping music and custom hit sounds. Everything saves with the project and travels in the standalone ZIP.
+
+Use **Load Workshop sample** for a complete example, or open [Forge Workshop](examples/forge-workshop.pinball.json). Loading the example can be undone. See [Phase 5 behavior and verification](docs/PHASE5.md) for exact defaults and limits.

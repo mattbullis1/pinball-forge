@@ -42,3 +42,17 @@ JSON/base64 and snapshot history are intentionally simple but can consume substa
 - scripts/build-player.mjs: builds a single IIFE and stylesheet from current shared sources, injected through virtual:pinball-player. No stale copied runtime or runtime CDN fetch. The editor static build also includes installed dependency license notices.
 
 ZIP creation retains all asset IDs and sequence links, including unused library assets. Export validation decodes all artwork before packaging. The last Blob download URL is retained for retry and revoked on replacement. A download request is described as ready, since browser confirmation can prevent finalization. Current ZIP export uses memory proportional to project assets; large-artwork stress testing remains outstanding.
+
+
+## Phase 5 modules
+
+- advanced-model.ts: optional component kinds, typed action data, missions, embedded audio records, validation and deleted-part reference cleanup.
+- game-rules.ts: contact-start event consumer, fixed-clock bonuses/combos, once-per-game actions, missions, light flashes and short-lived spark bursts. Actions cannot recursively emit collision events.
+- physics.ts: multiple Matter ball bodies with per-ball contact keys; a life ends only after all active balls drain. Same fixed stepping and speed bounds as Phase 3. Moving objects, magnet forces, ramp boosts and target collision masks share the same editor/export runtime.
+- advanced-ui.ts / advanced.css: hidden workshop, part drag/tap placement, dropdown rules, mission checkboxes and validated local audio import. No user scripts or remote asset URLs.
+- advanced-draw.ts: original Classic-compatible symbols and simulation-driven motion. draw.ts renders all active balls and rule effects.
+- game-audio.ts: shared synthesized hits plus embedded/relative audio playback, looping music, pause/mute/restart cleanup and visible error reporting.
+- workshop.ts: optional sample table and original generated WAV assets.
+- export-game.ts / game-package.ts: audio follows generated relative paths and retains exact bytes, alongside existing artwork handling. Older tables without advanced fields remain valid.
+
+Browser file saves, IndexedDB and undo snapshots serialize the complete optional data. Runtime state remains separate from editing data. All optional components remain flat 2D; ramps implement directional boost lanes without elevation. Repeated multiball rule actions can intentionally add more balls, so large user-authored combinations need performance judgment.

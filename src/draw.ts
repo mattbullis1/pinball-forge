@@ -1,10 +1,12 @@
 import {H,Part,Point,Table,W} from './model';
 import {end,perimeter,shape,vertices} from './geometry';
 import {drawPolished,surface,effects} from './polished';
+import {drawAdvanced} from './advanced-draw';
+import type {Burst} from './game-rules';
 const WHITE='#f4f4ef',BLACK='#050505';
 function path(c:CanvasRenderingContext2D,v:Point[]){c.beginPath();if(!v.length)return;c.moveTo(v[0].x,v[0].y);v.slice(1).forEach(p=>c.lineTo(p.x,p.y));c.closePath()}
 export function drawPart(c:CanvasRenderingContext2D,p:Part,flash=false,polished=false){
- if(p.kind==='artwork')return;if(polished&&drawPolished(c,p,flash))return;
+ if(p.kind==='artwork')return;flash ||= p.animationPhase===-1;if(drawAdvanced(c,p,flash))return;if(p.enabled===false){c.save();c.globalAlpha=.25;drawPart(c,{...p,enabled:true},false,polished);c.restore();return}if(polished&&drawPolished(c,p,flash))return;
  c.save();c.lineWidth=3;c.lineCap='square';c.lineJoin='miter';c.strokeStyle=WHITE;c.fillStyle=flash?WHITE:p.color;
  if(p.kind==='wall'){c.strokeStyle=flash?WHITE:p.color;c.lineWidth=p.boundary?4:7;c.beginPath();c.moveTo(p.x,p.y);c.lineTo(end(p).x,end(p).y);c.stroke()}
  else if(['obstacle','slingshot','leftFlipper','rightFlipper','target','drain'].includes(p.kind)){
@@ -22,14 +24,15 @@ export function drawPart(c:CanvasRenderingContext2D,p:Part,flash=false,polished=
  c.restore();
 }
 let buffer:HTMLCanvasElement|undefined;
-export type ViewOptions={selected?:string;corners?:boolean;invalid?:Table;gameParts?:Part[];ball?:Point;testing?:boolean;flash?:string;grid?:boolean;guides?:{x?:number;y?:number}};
+export type ViewOptions={selected?:string;corners?:boolean;invalid?:Table;gameParts?:Part[];ball?:Point;balls?:Point[];bursts?:Burst[];elapsed?:number;testing?:boolean;flash?:string;grid?:boolean;guides?:{x?:number;y?:number}};
 export function drawTable(ctx:CanvasRenderingContext2D,t:Table,o:ViewOptions={}){
  buffer??=document.createElement('canvas');const polished=t.theme==='polished';buffer.width=polished?W:W/2;buffer.height=polished?H:H/2;const c=buffer.getContext('2d')!;if(!polished)c.scale(.5,.5);
  // The separate background canvas lets native animated images sit beneath the game pieces.
  if(o.grid&&!o.testing){c.fillStyle='#ffffff22';for(let x=20;x<W;x+=20)for(let y=20;y<H;y+=20){c.fillRect(x,y,1,1)}}
  for(const p of o.gameParts??t.parts){if(o.testing&&p.kind==='ball')continue;drawPart(c,p,p.id===o.flash,polished)}
- if(o.ball){if(polished)drawPolished(c,{id:'runtime-ball',kind:'ball',...o.ball,r:10,color:WHITE,score:0,rotation:0});else{c.fillStyle=WHITE;c.beginPath();c.arc(o.ball.x,o.ball.y,10,0,7);c.fill()}}
+ for(const ball of o.balls??(o.ball?[o.ball]:[])){if(polished)drawPolished(c,{id:'runtime-ball',kind:'ball',...ball,r:10,color:WHITE,score:0,rotation:0});else{c.fillStyle=WHITE;c.beginPath();c.arc(ball.x,ball.y,10,0,7);c.fill()}}
  if(polished)effects(c,t,o.flash,o.testing);
+ for(const b of o.bursts??[]){const age=((o.elapsed??0)-b.start)/700;c.save();c.globalAlpha=Math.max(0,1-age);c.fillStyle=b.color;for(let i=0;i<16;i++){const a=i*Math.PI/8;c.fillRect(b.x+Math.cos(a)*age*90-2,b.y+Math.sin(a)*age*90-2,4,4)}c.restore()}
  if(!o.testing){
   const selected=t.parts.find(p=>p.id===o.selected);
   if(selected&&!o.corners){c.strokeStyle=WHITE;c.lineWidth=2;c.setLineDash([5,5]);const v=selected.kind==='wall'?[selected,end(selected)]:['artwork','obstacle','target','slingshot','leftFlipper','rightFlipper','launcher','drain'].includes(selected.kind)?shape(selected):[{x:selected.x-(selected.r??25),y:selected.y-(selected.r??25)},{x:selected.x+(selected.r??25),y:selected.y+(selected.r??25)}];const xs=v.map(p=>p.x),ys=v.map(p=>p.y);c.strokeRect(Math.min(...xs)-7,Math.min(...ys)-7,Math.max(...xs)-Math.min(...xs)+14,Math.max(...ys)-Math.min(...ys)+14);c.setLineDash([])}

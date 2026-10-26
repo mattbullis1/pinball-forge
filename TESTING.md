@@ -112,3 +112,8 @@ These browser checks used the browser-control tool, not a committed Playwright r
 Verified example.test resolved to development machine's private address. Existing web server AOV returned HTTP 200. No DNS, hosts, firewall, Apache, authentication, or network settings changed.
 
 Remaining gates: broad browser/device coverage, physically disconnected-network and direct-file verification, large-asset stress tests, and device-specific physics tuning. Phase 4 ZIP and independent local HTTP evidence are recorded above.
+
+
+## Phase 5 — 2026-10-26
+
+81 tests / 9 files and production build pass. See [Phase 5 acceptance report](docs/PHASE5.md) for the automated coverage, actual browser workflows, matching Test/export results, measured performance, screenshots and limits. Two QA packages include two WAV files each. The 768px tablet-width preview had no horizontal overflow. Physical-device input, audible output quality and a committed UI regression suite remain outstanding.

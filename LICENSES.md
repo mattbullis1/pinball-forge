@@ -21,3 +21,8 @@ Physics continues to use the existing MIT-licensed Matter.js dependency. The con
 ## Phase 4 packaging
 
 JSZip 3.10.2 is dual-licensed MIT or GPLv3; this project selects MIT. It runs in the editor to create ZIP files and is not included in the standalone player. The editor production build emits LICENSES.txt with application, Matter.js, JSZip and its installed dependency-tree notices, including pako. The game runtime includes only application code and Matter.js notices. No additional third-party graphics or sounds were added.
+
+
+## Phase 5 workshop
+
+All new symbols, rules/runtime code, fixtures and the two synthesized Workshop WAV files are original project work under the repository MIT license. No new packages, paid APIs, stock assets or historical game sounds were added. User-imported audio retains its original license; its author must supply any required notices when distributing exported games.

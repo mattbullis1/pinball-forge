@@ -1,11 +1,20 @@
 import {Asset,Artwork,validAsset,validArt} from './art-model';
 import { validGeometry } from './geometry';
-export type Kind = 'artwork'|'wall'|'obstacle'|'bumper'|'leftFlipper'|'rightFlipper'|'launcher'|'slingshot'|'target'|'rollover'|'drain'|'light'|'zone'|'ball';
+import {AdvancedKind,AdvancedSettings,AudioAsset,validAdvanced} from './advanced-model';
+export type Kind = AdvancedKind|'artwork'|'wall'|'obstacle'|'bumper'|'leftFlipper'|'rightFlipper'|'launcher'|'slingshot'|'target'|'rollover'|'drain'|'light'|'zone'|'ball';
 export type Point = {x:number;y:number};
-export type Part = {id:string;kind:Kind;x:number;y:number;x2?:number;y2?:number;r?:number;color:string;score:number;rotation:number;boundary?:boolean;points?:Point[];scale?:number;mirror?:boolean;art?:Artwork};
-export type Table = {id:string;title:string;surface:string;wallColor:string;exterior?:string;parts:Part[];assets?:Record<string,Asset>;theme?:'classic'|'polished'};
+export type Part = {id:string;kind:Kind;x:number;y:number;x2?:number;y2?:number;r?:number;color:string;score:number;rotation:number;boundary?:boolean;points?:Point[];scale?:number;mirror?:boolean;art?:Artwork;enabled?:boolean;animationPhase?:number};
+export type Table = {id:string;title:string;surface:string;wallColor:string;exterior?:string;parts:Part[];assets?:Record<string,Asset>;theme?:'classic'|'polished';advanced?:AdvancedSettings;sounds?:Record<string,AudioAsset>};
 export const W=560,H=840;
 export const palette:{kind:Kind;label:string;group:string;icon:string}[]=[
+{kind:'multiball',label:'Multiball gate',group:'Advanced',icon:'●'},
+{kind:'ramp',label:'Boost ramp (2D)',group:'Advanced',icon:'↑'},
+{kind:'movingObstacle',label:'Moving obstacle',group:'Advanced',icon:'↔'},
+{kind:'dropTarget',label:'Drop target',group:'Advanced',icon:'▣'},
+{kind:'magnet',label:'Magnet',group:'Advanced',icon:'∩'},
+{kind:'spinner',label:'Spinner',group:'Advanced',icon:'✳'},
+{kind:'bonus',label:'Timed 2× bonus',group:'Advanced',icon:'2×'},
+{kind:'extraBall',label:'Extra ball',group:'Advanced',icon:'+1'},
 {kind:'artwork',label:'Artwork',group:'Decoration',icon:'▧'},
 {kind:'leftFlipper',label:'Left flipper',group:'Controls',icon:'◢'},{kind:'rightFlipper',label:'Right flipper',group:'Controls',icon:'◣'},
 {kind:'ball',label:'Pinball',group:'Controls',icon:'●'},{kind:'launcher',label:'Launcher',group:'Controls',icon:'↟'},
@@ -28,7 +37,8 @@ export const presets:Preset[]=[
 {id:'launcher',label:'Launcher',kind:'launcher'},{id:'drain',label:'Drain',kind:'drain'},
 {id:'rollover',label:'Rollover',kind:'rollover',changes:{color:colors[1]}},{id:'zone',label:'Scoring zone',kind:'zone'},
 {id:'light',label:'Purple light',kind:'light'},{id:'greenLight',label:'Green light',kind:'light',changes:{color:colors[1]}}];
-export function fromPreset(id:string,x:number,y:number){const preset=presets.find(p=>p.id===id)!;return Object.assign(makePart(preset.kind,x,y),structuredClone(preset.changes??{}))}
+export const advancedPresets:Preset[]=palette.filter(p=>p.group==='Advanced').map(p=>({id:p.kind,label:p.label,kind:p.kind,changes:{color:colors[4],score:p.kind==='dropTarget'?250:p.kind==='spinner'?100:0}}));
+export function fromPreset(id:string,x:number,y:number){const preset=[...presets,...advancedPresets].find(p=>p.id===id)!;return Object.assign(makePart(preset.kind,x,y),structuredClone(preset.changes??{}))}
 export function newTable(title='My Pinball Table'):Table{
 const outline:Point[]=[{x:60,y:22},{x:440,y:22},{x:530,y:100},{x:530,y:810},{x:340,y:810},{x:205,y:810},{x:28,y:750},{x:28,y:440},{x:60,y:365},{x:28,y:310},{x:28,y:80}];
 const parts:Part[]=outline.flatMap((v,i)=>i===4?[]:[{...makePart('wall',v.x,v.y),x2:outline[(i+1)%outline.length].x,y2:outline[(i+1)%outline.length].y,boundary:true,color:colors[1]}]);
@@ -51,4 +61,4 @@ if(p.scale!==undefined&&(!Number.isFinite(p.scale)||p.scale<.4||p.scale>2))retur
 if(p.boundary!==undefined&&typeof p.boundary!=='boolean'||p.boundary&&p.kind!=='wall')return false;
 if(p.kind==='wall'&&![p.x2,p.y2].every(Number.isFinite))return false;
 if(p.kind==='obstacle'&&(!Array.isArray(p.points)||p.points.length<3||p.points.length>64||p.points.some(v=>!v||![v.x,v.y].every(Number.isFinite))))return false;}
-return validGeometry(t);}
+return validGeometry(t)&&validAdvanced(t);}

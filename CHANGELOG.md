@@ -53,3 +53,13 @@
 - Verified 65 tests, build, four standalone packages, the user's finalized browser download, Chrome tablet/narrow layouts and animation evidence.
 - Direct file:// was blocked by test tooling; physically disconnected Internet and physical tablet tests remain unverified.
 - Added isolated local web server export QA files without changing server/network settings or existing sites. Phase 5 remains gated.
+
+
+## 0.6.0 — Phase 5 optional workshop (2026-10-26)
+
+- Added eight optional parts, multiball lifecycle, flat animated ramp boosts, moving obstacles, drop targets, magnets and spinners.
+- Added contact rules, activation/deactivation, extra balls, timed bonuses, combos, missions, flashing lights and spark effects.
+- Added local audio import, music loops and custom sound actions with shared pause/mute/restart behavior.
+- Preserved audio bytes, optional rules and settings through projects and standalone ZIPs.
+- Kept the Classic palette unchanged; new controls open through Advanced +.
+- Added Workshop and Rule Circuit examples, 16 regression tests, and browser/export evidence. 81 tests and build pass.

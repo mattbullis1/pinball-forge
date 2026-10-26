@@ -1,0 +1,6 @@
+{
+  "game": "{\"state\":\"ready\",\"elapsedMs\":11433.3333333338,\"score\":4650,\"balls\":2,\"ball\":{\"x\":508,\"y\":790.003074302407},\"velocity\":{\"x\":0,\"y\":0},\"canLaunch\":true,\"advanced\":{\"activeBalls\":1,\"multiplier\":1,\"bonusSeconds\":0,\"combo\":0,\"missions\":[{\"title\":\"Clear the three targets\",\"hits\":2,\"total\":3,\"complete\":false}]},\"flippers\":[{\"kind\":\"leftFlipper\",\"angle\":28},{\"kind\":\"rightFlipper\",\"angle\":-28}]}",
+  "performance": "{\"frames\":2400,\"renderP95Ms\":0.5,\"activeIntervalP95Ms\":16.9,\"stallsOver500ms\":0,\"heapMB\":29.5,\"artwork\":0}",
+  "runtimeError": null,
+  "simulationP95Ms": "0.40"
+}
