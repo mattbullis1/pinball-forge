@@ -1,0 +1,12 @@
+{
+  "before": {
+    "deviation": 0,
+    "escapeMs": null,
+    "score": 4500
+  },
+  "after": {
+    "deviation": 222.19954052332014,
+    "escapeMs": 717,
+    "score": 400
+  }
+}

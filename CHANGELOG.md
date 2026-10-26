@@ -63,3 +63,11 @@
 - Preserved audio bytes, optional rules and settings through projects and standalone ZIPs.
 - Kept the Classic palette unchanged; new controls open through Advanced +.
 - Added Workshop and Rule Circuit examples, 16 regression tests, and browser/export evidence. 81 tests and build pass.
+
+
+## Phase 5 follow-up — bumper bounce variation (2026-10-26)
+
+- User confirmed the sound is good and reported repeating bounces between the lower slingshots.
+- Added up to two degrees of scatter to powered bumper/slingshot impulses, retaining impulse magnitude and incoming tangential motion. Passive walls and flipper behavior are unchanged.
+- Scatter advances only on powered contacts and resets with Restart, preserving fixed-timestep replay and editor/export consistency.
+- 84 tests and production build pass. Updated the two local Phase 5 QA ZIPs and standalone player folders from the existing editable examples.

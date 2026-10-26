@@ -110,6 +110,34 @@ describe('contact scoring and rubber',()=>{
 });
 
 describe('longer independent table runs',()=>{
+ it('breaks an exactly repeating two-bumper rally without changing the frame-rate result',()=>{
+  const outcomes=[30,60,120,144].map(hz=>{
+   const {game,engine,body}=rig([makePart('ball',280,350),makePart('bumper',180,350),makePart('bumper',380,350)]);
+   engine.gravity.scale=0;Matter.Body.setVelocity(body(),{x:12,y:0});let deviation=0;
+   for(let i=0;i<hz*8;i++){game.step(1000/hz);if(game.ball())deviation=Math.max(deviation,Math.abs(game.ball()!.y-350))}
+   expect(deviation).toBeGreaterThan(40);return game.snapshot();
+  });
+  for(const actual of outcomes){expect(actual.score).toBe(outcomes[0].score);expect(actual.ball!.x).toBeCloseTo(outcomes[0].ball!.x,5);expect(actual.ball!.y).toBeCloseTo(outcomes[0].ball!.y,5)}
+ });
+ it.each(['bumper','slingshot'] as const)('keeps %s scatter small, contact-only and repeatable after restart',kind=>{
+  const {game,engine,body,hit}=rig([makePart('ball',280,200),makePart(kind,280,300)]);engine.gravity.scale=0;
+  const contact=()=>{Matter.Body.setPosition(body(),{x:280,y:200});Matter.Body.setVelocity(body(),{x:0,y:12});const count=hit.mock.calls.length;for(let i=0;i<60&&hit.mock.calls.length===count;i++)game.step(TICK_MS);expect(hit.mock.calls.length).toBe(count+1);return game.snapshot()};
+  const original=Matter.Body.setVelocity,angles:number[]=[];let observing=false;
+  vi.spyOn(Matter.Body,'setVelocity').mockImplementation((b,next)=>{
+   if(observing&&b===body()){
+    const p=game.parts()[1],v=Matter.Body.getVelocity(b),impulse={x:next.x-v.x,y:next.y-v.y};
+    const outline=shape(p),nearest=kind==='bumper'?p:outline.map((a,i)=>project(b.position,a,outline[(i+1)%outline.length])).sort((a,b)=>a.distance-b.distance)[0].point;
+    const dx=b.position.x-nearest.x,dy=b.position.y-nearest.y,length=Math.hypot(dx,dy),normal={x:dx/length,y:dy/length};
+    if(Math.hypot(impulse.x,impulse.y)>0){angles.push(Math.atan2(impulse.y*normal.x-impulse.x*normal.y,impulse.x*normal.x+impulse.y*normal.y));expect(Math.hypot(impulse.x,impulse.y)).toBeCloseTo(Math.max(0,(kind==='bumper'?12:10)-(v.x*normal.x+v.y*normal.y)),7)}
+   }
+   original(b,next);
+  });
+  // The manual starting velocity is excluded; observe only the game's impulse.
+  const originalStep=game.step;game.step=dt=>{observing=true;originalStep(dt);observing=false};
+  const first=contact();game.restart();expect(game.snapshot().velocity).toEqual({x:0,y:0});game.pause(true);run(game,120);game.pause(false);const second=contact();
+  expect(second.velocity!.x).toBeCloseTo(first.velocity!.x,8);expect(second.velocity!.y).toBeCloseTo(first.velocity!.y,8);
+  expect(angles).toHaveLength(2);for(const angle of angles){expect(Math.abs(angle)).toBeGreaterThan(.0001);expect(Math.abs(angle)).toBeLessThanOrEqual(2*Math.PI/180+1e-8)}
+ });
  it('runs three samples and a reshaped table for 30 seconds each without escaping or mutating construction',()=>{
   const tables=sampleTables();const altered=structuredClone(tables[0]);altered.title='Sculpted physics trial';moveVertex(altered,{id:altered.parts[0].id,index:0,point:altered.parts[0]},{x:80,y:40});
   altered.parts.find(p=>p.kind==='bumper')!.x=220;altered.parts.filter(p=>p.kind.endsWith('Flipper')).forEach(p=>p.scale=.9);tables.push(altered);

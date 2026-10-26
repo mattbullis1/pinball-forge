@@ -9,6 +9,8 @@ export const TICK_MS=1000/120;
 const SUBSTEPS=4, STEP_MS=TICK_MS/SUBSTEPS;
 export const MAX_BALL_SPEED=36; // Matter units: table units per 60 Hz frame.
 const SWING=.7, UP_SPEED=10, RETURN_SPEED=5;
+const KICK_SCATTER=2*Math.PI/180;
+const SCATTER_SEED=0x6d2b79f5;
 export type GameState='ready'|'playing'|'paused'|'gameover';
 export type GameSnapshot={state:GameState;elapsedMs:number;score:number;balls:number;ball?:Point;velocity?:Point;canLaunch:boolean;advanced:AdvancedSnapshot};
 export type Game={step:(dt:number)=>void;stop:()=>void;restart:()=>void;pause:(paused:boolean)=>void;snapshot:()=>GameSnapshot;ball:()=>Point|undefined;score:()=>number;balls:()=>number;launch:()=>void;flippers:(left:boolean,right:boolean)=>void;parts:()=>Part[];flash:()=>string|undefined;ballPositions:()=>Point[];effects:()=>Burst[]};
@@ -19,6 +21,10 @@ export function createGame(source:Table,onChange:()=>void,onHit?:(score:number)=
   const engine=Engine.create({gravity:{x:0,y:1.1,scale:.001}});
   engine.positionIterations=10; engine.velocityIterations=10;
   let points=0,remaining=3,elapsed=0,accumulator=0;
+  // Advance only on powered contacts, never on render frames. A fixed seed keeps
+  // replay/restart and the editor/export identical while varying successive kicks.
+  let scatterState=SCATTER_SEED;
+  function scatterAngle(){scatterState^=scatterState<<13;scatterState^=scatterState>>>17;scatterState^=scatterState<<5;return ((scatterState>>>0)/0x100000000*2-1)*KICK_SCATTER}
   let ball:Matter.Body|undefined;
   let leftOn=false,rightOn=false,paused=false,stopped=false,serving=true;
   let lastHit:string|undefined,hitTime=-Infinity;
@@ -123,7 +129,11 @@ export function createGame(source:Table,onChange:()=>void,onHit?:(score:number)=
     const length=Math.hypot(normal.x,normal.y);if(length<.001)return;
     normal.x/=length;normal.y/=length;
     const v=Body.getVelocity(ball),outward=v.x*normal.x+v.y*normal.y,kick=Math.max(0,(p.kind==='bumper'?12:10)-outward);
-    Body.setVelocity(ball,{x:v.x+normal.x*kick,y:v.y+normal.y*kick});
+    if(kick>0){const angle=scatterAngle(),cos=Math.cos(angle),sin=Math.sin(angle);
+      // Vary just the powered rubber impulse. Preserve the incoming tangent and
+      // impulse magnitude; passive walls and player-controlled flippers stay exact.
+      Body.setVelocity(ball,{x:v.x+(normal.x*cos-normal.y*sin)*kick,y:v.y+(normal.x*sin+normal.y*cos)*kick});
+    }
   }
   function drain() {
     if(!ball)return;Composite.remove(engine.world,ball);liveBalls.splice(liveBalls.indexOf(ball),1);ball=liveBalls[0];
@@ -178,7 +188,7 @@ export function createGame(source:Table,onChange:()=>void,onHit?:(score:number)=
       while(accumulator+1e-8>=TICK_MS&&ball){for(let i=0;i<SUBSTEPS&&ball;i++)substep();accumulator-=TICK_MS}
     },
     stop(){if(stopped)return;stopped=true;ball=undefined;liveBalls.length=0;Composite.clear(engine.world,false);Engine.clear(engine)},
-    restart(){if(stopped)return;points=elapsed=accumulator=0;remaining=3;rules.reset();dropped.clear();spins.clear();for(const p of t.parts){enable(p.id,p.enabled!==false);if(p.kind==='movingObstacle'||p.kind==='spinner'){const b=bodies.get(p.id)!;Body.setPosition(b,{x:p.x,y:p.y});Body.setAngle(b,p.rotation*Math.PI/180)}}leftOn=rightOn=paused=false;lastHit=undefined;hitTime=-Infinity;for(const f of flippers){moveFlipper(f,0,false);Body.setVelocity(f.body,{x:0,y:0});Body.setAngularVelocity(f.body,0)}Engine.clear(engine);spawn();onChange()},
+    restart(){if(stopped)return;points=elapsed=accumulator=0;scatterState=SCATTER_SEED;remaining=3;rules.reset();dropped.clear();spins.clear();for(const p of t.parts){enable(p.id,p.enabled!==false);if(p.kind==='movingObstacle'||p.kind==='spinner'){const b=bodies.get(p.id)!;Body.setPosition(b,{x:p.x,y:p.y});Body.setAngle(b,p.rotation*Math.PI/180)}}leftOn=rightOn=paused=false;lastHit=undefined;hitTime=-Infinity;for(const f of flippers){moveFlipper(f,0,false);Body.setVelocity(f.body,{x:0,y:0});Body.setAngularVelocity(f.body,0)}Engine.clear(engine);spawn();onChange()},
     pause(value){paused=value;accumulator=0;if(value)leftOn=rightOn=false;onChange()},
     snapshot(){return{state:remaining===0?'gameover':paused?'paused':serving?'ready':'playing',elapsedMs:elapsed,score:points,balls:remaining,ball:ball?{...ball.position}:undefined,velocity:ball?Body.getVelocity(ball):undefined,canLaunch:!!ball&&serving&&!paused&&!stopped,advanced:rules.snapshot(liveBalls.length)}},
     ball:()=>ball?{...ball.position}:undefined,score:()=>points,balls:()=>remaining,

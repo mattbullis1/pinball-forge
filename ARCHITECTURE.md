@@ -56,3 +56,6 @@ ZIP creation retains all asset IDs and sequence links, including unused library 
 - export-game.ts / game-package.ts: audio follows generated relative paths and retains exact bytes, alongside existing artwork handling. Older tables without advanced fields remain valid.
 
 Browser file saves, IndexedDB and undo snapshots serialize the complete optional data. Runtime state remains separate from editing data. All optional components remain flat 2D; ramps implement directional boost lanes without elevation. Repeated multiball rule actions can intentionally add more balls, so large user-authored combinations need performance judgment.
+
+
+Powered rubber contacts use a small, fixed-seed pseudo-random sequence to rotate just the added impulse by at most two degrees. The generator advances only when the collision needs a kick, never on display frames, and resets on Restart. This breaks perfectly repeated powered bounces while retaining repeatable simulations and the existing speed cap.

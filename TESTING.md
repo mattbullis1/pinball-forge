@@ -117,3 +117,12 @@ Remaining gates: broad browser/device coverage, physically disconnected-network 
 ## Phase 5 — 2026-10-26
 
 81 tests / 9 files and production build pass. See [Phase 5 acceptance report](docs/PHASE5.md) for the automated coverage, actual browser workflows, matching Test/export results, measured performance, screenshots and limits. Two QA packages include two WAV files each. The 768px tablet-width preview had no horizontal overflow. Physical-device input, audible output quality and a committed UI regression suite remain outstanding.
+
+
+## Bumper/slingshot bounce regression — 2026-10-26
+
+84 tests / 9 files and production build pass. A zero-gravity two-bumper fixture previously stayed on the exact center line for an eight-second run (45 awards). With contact scatter it left a 40-unit corridor after 717 ms (4 awards). The fixture isolates symmetry; it does not claim to reproduce every possible user-built trap. Before/after measurements: `docs/bounce-scatter-check.json`.
+
+New tests verify escape, identical outcomes at 30/60/120/144 Hz, a maximum two-degree powered-impulse deviation, preserved impulse magnitude, and restart/pause repeatability for bumpers and slingshots. Existing high-speed wall/flipper tests remain green. Passive resting pockets in table geometry are unaffected by this change; it is not a universal unstuck mechanism.
+
+The user confirmed the sound is good on their device. Both local Phase 5 exported-game folders and their ZIPs were rebuilt using the same updated runtime; existing downloaded ZIPs require re-export to receive this fix.

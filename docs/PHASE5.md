@@ -62,3 +62,8 @@ Run `npm.cmd test` and `npm.cmd run build`. `node scripts/phase5-qa.mjs` builds 
 ## Remaining limits
 
 Physical tablet input and a separate-device LAN test are unverified. The browser accepted WAV import and playback produced no error message; speaker output and perceived audio quality have not been listened to through this tool. Other audio codecs depend on each browser. Browser workflows were exercised through CUA, not a committed browser regression suite. Large media collections, many simultaneous balls, and exhaustive rule combinations have not been stress-tested. Direct `file://` opening and physically disconnected networking retain the Phase 4 verification limits. Physics is an arcade 2D model. These are review limits, not claims of universal compatibility.
+
+
+### Follow-up review
+
+The user confirmed sound quality is good on their device. The reported lower-bumper repeating bounce received a small contact-scatter fix; see TESTING.md and `bounce-scatter-check.json`. The new total is 84 passing tests. The original Phase 5 screenshots and package-size measurements above describe the phase checkpoint; the local QA player/ZIP runtime has since been rebuilt with this fix.
