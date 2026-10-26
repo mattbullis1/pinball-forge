@@ -1,0 +1,7 @@
+{
+  "game": "{\"state\":\"paused\",\"elapsedMs\":30233.33333332718,\"score\":100,\"balls\":2,\"ball\":{\"x\":508,\"y\":790.003074302407},\"velocity\":{\"x\":0,\"y\":0},\"canLaunch\":false,\"flippers\":[{\"kind\":\"leftFlipper\",\"angle\":28},{\"kind\":\"rightFlipper\",\"angle\":-28}]}",
+  "performance": "{\"frames\":720,\"renderP95Ms\":1.7,\"activeIntervalP95Ms\":67.4,\"stallsOver500ms\":0,\"heapMB\":25.9,\"artwork\":3}",
+  "playKey": "{\"event\":\"keyup\",\"code\":\"Space\"}",
+  "renderFrames": "768",
+  "simulationP95Ms": "0.90"
+}

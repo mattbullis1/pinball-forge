@@ -1,0 +1,18 @@
+{
+  "source": "[private-path]",
+  "bytes": 42414,
+  "sha256": "11e7a7aa5236189e6f9b0cff4ee45fcc7303f09d817c4001a3e271f095481fd3",
+  "title": "Classic Builder",
+  "parts": 28,
+  "files": [
+    "index.html",
+    "runtime.js",
+    "player.css",
+    "table.js",
+    "LICENSES.txt",
+    "README.txt"
+  ],
+  "crcVerified": true,
+  "playerFilesMatch": true,
+  "tableMatchesExceptGeneratedIds": true
+}

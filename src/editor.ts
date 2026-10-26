@@ -5,6 +5,9 @@ import {History} from './history';
 import {drawTable,drawThumbnail,drawBackground} from './draw';
 import {createGame,Game} from './physics';
 import {FlipperInput} from './play-input';
+import {GameAudio} from './game-audio';
+import {createGameZip} from './export-game';
+import * as playerBundle from 'virtual:pinball-player';
 import {ArtworkLayers,checkArtwork} from './artwork';
 import {artworkControls,artworkProperties} from './art-ui';
 import {measureRender,measureSimulation} from './diagnostics';
@@ -19,6 +22,7 @@ const modeInfo:Record<Mode,[string,string,string]>={
 const icon=(path:string)=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${path}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"/></svg>`;
 const app=document.querySelector<HTMLDivElement>('#app')!;
 app.innerHTML=`<header><h1>PINBALL FORGE</h1><nav aria-label="Project"><button id="new">New</button><button id="open">Open</button><button id="save">Save</button><button id="undo">Undo</button><button id="redo">Redo</button><button id="test">▶ Test</button><button id="export" title="Download an editable project file">Project ↓</button></nav></header>
+<div class="download-bar"><button id="download-game">DOWNLOAD MY PINBALL GAME</button><span id="download-status" role="status">Standalone HTML5 ZIP · everything included</span></div>
 <main><section class="stage" aria-label="Pinball table"><div class="table-heading"><span id="table-title"></span><button id="settings" aria-label="Table settings">Table ▾</button></div><div class="canvas-wrap"><canvas id="background" width="560" height="840" aria-hidden="true"></canvas><div id="art-back" class="art-layer" aria-hidden="true"></div><canvas id="canvas" width="560" height="840" tabindex="0" aria-label="Pinball construction playfield"></canvas><div id="art-front" class="art-layer" aria-hidden="true"></div></div><div id="touch-play" hidden><button id="left">Left flipper</button><button id="launch">Launch</button><button id="right">Right flipper</button></div></section>
 <section class="workbox" aria-label="Parts and tools"><div class="parts-area"><div id="build-box"><div class="box-heading"><span>PARTS BOX</span><label class="snap"><input type="checkbox" id="snap" checked> Snap</label></div><div id="parts" aria-label="Component palette"></div><div id="part-help">Take a part. Put it on the table.</div><button id="artwork">Artwork +</button><div id="selection" class="selection"><strong id="selection-name">Your construction set</strong><div id="selection-actions" hidden><button id="tune">Adjust</button><button id="duplicate">Duplicate</button><button id="delete">Delete</button></div><p id="selection-help">Shape the walls. Add a few parts. Try it.</p></div><details id="accessible-parts"><summary>Select a part by name</summary><label>Table parts<select id="part-list"><option value="">Choose a part</option></select></label></details></div>
 <div id="scoreboard" hidden aria-label="Playtest scoreboard"><p class="small">PINBALL FORGE</p><h2 id="game-title"></h2><div class="score-label">SCORE</div><output id="score">00000000</output><div class="score-label">BALLS</div><output id="balls">● ● ●</output><p id="game-state">Make something. Play something.</p><button id="pause">Pause</button><button id="restart">Restart game</button><button id="back">Back to Build</button><p class="instructions">LEFT SHIFT · RIGHT SHIFT<br>SPACE TO LAUNCH</p><label><input type="checkbox" id="sound" checked> Sound</label></div></div>
@@ -134,13 +138,27 @@ $('#open').addEventListener('click',()=>{if(game)return;$<HTMLDialogElement>('#o
 $('#open-saved').addEventListener('click',async()=>{try{const value=await loadProject();if(!value){toast('No saved project in this browser yet.');return}await checkArtwork(value);replaceTable(value);$<HTMLDialogElement>('#open-dialog').close();toast('Saved project and artwork opened')}catch(e){toast('Could not open the saved project. '+String(e))}});
 $('#open-file').addEventListener('click',()=>{$<HTMLDialogElement>('#open-dialog').close();$('#file').click()});
 $('#file').addEventListener('change',async e=>{const input=e.target as HTMLInputElement,file=input.files?.[0];if(!file)return;try{const value=JSON.parse(await file.text());if(!validateTable(value))throw Error('Invalid project data');await checkArtwork(value);if(!game){replaceTable(value);toast('Project file opened')}}catch{toast('Could not read a valid table. Your current table is unchanged.')}finally{input.value=''}});
-$('#export').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(table,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`${table.title.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.pinball.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Editable project downloaded. Standalone game export is a later phase.')});
-let audio:AudioContext|undefined;
-function sound(score:number){if(!$<HTMLInputElement>('#sound').checked||!audio)return;const oscillator=audio.createOscillator(),gain=audio.createGain();oscillator.type='square';oscillator.frequency.setValueAtTime(score?660:330,audio.currentTime);oscillator.frequency.exponentialRampToValueAtTime(180,audio.currentTime+.09);gain.gain.setValueAtTime(.025,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.1);oscillator.connect(gain).connect(audio.destination);oscillator.start();oscillator.stop(audio.currentTime+.1)}
+$('#export').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(table,null,2)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`${table.title.toLowerCase().replace(/[^a-z0-9]+/g,'-')}.pinball.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Editable project downloaded. Use DOWNLOAD MY PINBALL GAME for a playable ZIP.')});
+const audio=new GameAudio(()=>$<HTMLInputElement>('#sound').checked);
+const sound=audio.hit;
+let exporting=false,exportUrl:string|undefined;
+$('#download-game').addEventListener('click',async()=>{
+ if(exporting)return;finishDrag();if(game)pauseTest(true);const snapshot=structuredClone(table),button=$<HTMLButtonElement>('#download-game');
+ exporting=true;button.disabled=true;$('#download-status').textContent='Checking artwork…';
+ try{
+  await checkArtwork(snapshot);
+  const result=await createGameZip(snapshot,playerBundle,percent=>$('#download-status').textContent='Packing your game… '+percent+'%');
+  if(exportUrl)URL.revokeObjectURL(exportUrl);$('#download-status').querySelector('a')?.remove();
+  exportUrl=URL.createObjectURL(new Blob([new Uint8Array(result.bytes).buffer],{type:'application/zip'}));const link=document.createElement('a');link.href=exportUrl;link.download=result.filename;link.textContent='Save ZIP again';
+  $('#download-status').textContent=result.filename+' ready · '+result.fileCount+' files · '+result.assetCount+' images · ';$('#download-status').append(link);link.click();
+  toast('Your game is ready. Extract the whole ZIP and open index.html.');
+ }catch(error){$('#download-status').textContent='Export failed: '+(error instanceof Error?error.message:String(error));toast('Export could not finish. Your editable table is unchanged.')}
+ finally{exporting=false;button.disabled=false}
+});
 function playUI(on:boolean){if(on)artControls.close();$('#build-box').hidden=on;$('#scoreboard').hidden=!on;$('#touch-play').hidden=!on;$('.tools').hidden=on;$('#inspector').hidden=true;$('#test').textContent=on?'■ Back to Build':'▶ Test';for(const id of ['new','open','settings'])$<HTMLButtonElement>('#'+id).disabled=on;$('#game-title').textContent=table.title;refresh()}
 function startTest(){
  if(game)return;finishDrag();playInput.clear();chosen=undefined;
- try{audio??=new AudioContext();void audio.resume()}catch{/* Silent play remains available. */}
+ void audio.unlock();
  game=createGame(table,()=>{},sound);playUI(true);canvas.focus();
  message('Left Shift / Right Shift: flippers · Space: launch · Escape: back to build');
  let last=performance.now();
@@ -148,9 +166,9 @@ function startTest(){
  raf=requestAnimationFrame(loop);
 }
 function stopTest(){if(!game)return;cancelAnimationFrame(raf);playInput.clear();game.stop();game=undefined;playUI(false);message('Back to building — your table is exactly as you left it')}
-function pauseTest(paused:boolean){if(!game||game.balls()===0)return;playInput.clear();game.pause(paused);if(!paused){void audio?.resume();canvas.focus()}paintCanvas(false)}
+function pauseTest(paused:boolean){if(!game||game.balls()===0)return;playInput.clear();game.pause(paused);if(!paused){void audio.unlock();canvas.focus()}paintCanvas(false)}
 $('#test').addEventListener('click',()=>game?stopTest():startTest());$('#tool-test').addEventListener('click',startTest);$('#back').addEventListener('click',stopTest);
-$('#restart').addEventListener('click',()=>{playInput.clear();game?.restart();void audio?.resume();canvas.focus();paintCanvas(false)});
+$('#restart').addEventListener('click',()=>{playInput.clear();game?.restart();void audio.unlock();canvas.focus();paintCanvas(false)});
 $('#pause').addEventListener('click',()=>pauseTest(game?.snapshot().state!=='paused'));
 for(const id of ['left','right','launch'] as const){
  const b=$<HTMLButtonElement>('#'+id);

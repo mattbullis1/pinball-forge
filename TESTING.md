@@ -1,5 +1,14 @@
 # Testing
 
+## Phase 4 verification — 2026-10-26
+
+**65 tests pass** across seven files; TypeScript and Vite production build pass. Added ZIP CRC/inventory checks, exact original-image preservation, generated-path validation, escaping, three sample runtime-equivalence checks, actual player build/no-network-API checks, real artwork fixtures and editor-license packaging.
+
+The browser-generated Classic ZIP was finalized by the user, found in Downloads, CRC-checked and tested independently through web server. Four table packages were tested, including all supported image/animation formats, scoring, drains, game over, restart, pause and fullscreen. Chrome viewport tests covered tablet and narrow layouts. See [Phase 4 acceptance evidence](docs/PHASE4.md) for exact counts, screenshots, performance readings and limits.
+
+Direct file:// opening was blocked by browser tooling and was not bypassed. No physical network-disconnection or separate-device test was performed. Automated bundle/resource checks establish no external runtime dependencies; independent local HTTP playback was verified.
+
+
 ## Phase 3 verification — 2026-10-25
 
 **51 automated tests pass** across four files; TypeScript and Vite production build pass. Added 22 physics/input checks to the previous 29. The test suite covers:
@@ -34,7 +43,7 @@ This is an arcade model with fixed substeps and bounded speeds, not exact contin
 
 ## Phase 2 verification — 2026-10-25
 
-`npm test`: **29 tests passed** in three files. `npm run build`: TypeScript and Vite production build passed. Added tests cover embedded image preservation, role validation, external/missing asset rejection, opacity/dimension/frame validation, frame timing, sequence-versus-sheet cropping, rotated artwork geometry, and decoration/obstacle/target physics. Existing construction and physics checks still pass.
+`npm.cmd test`: **29 tests passed** in three files. `npm.cmd run build`: TypeScript and Vite production build passed. Added tests cover embedded image preservation, role validation, external/missing asset rejection, opacity/dimension/frame validation, frame timing, sequence-versus-sheet cropping, rotated artwork geometry, and decoration/obstacle/target physics. Existing construction and physics checks still pass.
 
 ### Actual browser workflows
 
@@ -66,7 +75,7 @@ Standalone HTML5 ZIP and offline exported-game animation checks remain Phase 4. 
 
 ## Automated checks — 2026-10-25
 
-`npm test`: **21 tests passed** across model.test.ts and construction.test.ts.
+`npm.cmd test`: **21 tests passed** across model.test.ts and construction.test.ts.
 
 - Independent samples and sensible defaults.
 - Save/load round trips; rejection of malformed coordinates, radii, IDs, and polygons.
@@ -81,7 +90,7 @@ Standalone HTML5 ZIP and offline exported-game animation checks remain Phase 4. 
 - Each sample launch clears the shooter lane into the playfield.
 - All three samples simulate 1,200 fixed steps with finite positions.
 
-`npm run build`: TypeScript check and production build passed. These tests do not establish full pinball realism or universal high-speed collision stability.
+`npm.cmd run build`: TypeScript check and production build passed. These tests do not establish full pinball realism or universal high-speed collision stability.
 
 ## Browser checks — 2026-10-25
 
@@ -102,4 +111,4 @@ These browser checks used the browser-control tool, not a committed Playwright r
 
 Verified example.test resolved to development machine's private address. Existing web server AOV returned HTTP 200. No DNS, hosts, firewall, Apache, authentication, or network settings changed.
 
-Later gates: standalone ZIP generation, independent exported-game and offline tests, broad browser/device coverage, large-asset stress tests, and further device-specific physics tuning. Do not describe these as complete.
+Remaining gates: broad browser/device coverage, physically disconnected-network and direct-file verification, large-asset stress tests, and device-specific physics tuning. Phase 4 ZIP and independent local HTTP evidence are recorded above.

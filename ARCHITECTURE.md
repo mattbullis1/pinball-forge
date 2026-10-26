@@ -18,7 +18,7 @@ The runtime owns serving/launch eligibility, three-ball drains, restart, pause, 
 
 Projects use IndexedDB for one browser save, with read-only fallback to the earlier localStorage save. JSON interchange embeds raster image bytes as data URLs. Vite emits static files with relative paths. Development access is through example.test on port 5173; web server and all existing sites remain unchanged.
 
-The future standalone player should consume the same model, geometry, renderer, and rules using a separate entry point with bundled assets/licenses. This revision does not implement ZIP generation, community hosting, or backend services.
+The standalone player consumes the same model, geometry, renderer and rules through a separate bundled entry point. Community hosting and backend services remain outside this revision.
 
 ## Phase 2 modules
 
@@ -31,4 +31,14 @@ The future standalone player should consume the same model, geometry, renderer, 
 
 Sprite updates only change image styles when the frame changes. Native GIF/WebP retain original disposal and timing through browser image rendering. Sprite sheets and sequences use one animation loop; hidden-document sprite work pauses. During play, artwork layout is stable and only hit feedback changes. The same transformed rectangle feeds artwork hit testing and Matter collisions. Compound contacts are deduplicated per collision event.
 
-JSON/base64 and snapshot history are intentionally simple but can consume substantial memory with large artwork collections. Native GIF/WebP cannot be precisely synchronized or paused through this implementation. The separate player must reuse the layer and asset modules; exported-game compatibility is still a Phase 4 test gate.
+JSON/base64 and snapshot history are intentionally simple but can consume substantial memory with large artwork collections. Native GIF/WebP cannot be precisely synchronized or paused through this implementation. The standalone player reuses these layer and asset modules; see docs/PHASE4.md for exported-game evidence and browser limitations.
+
+## Phase 4 modules
+
+- export-game.ts: JSZip packages a cloned validated table, original image bytes, embedded player build, styles and notices. Filenames are generated independently of imported names. Script data and HTML titles are escaped.
+- game-package.ts: versioned standalone manifest and strict generated relative image paths, validated through the existing table validator. Editable JSON keeps embedded data URLs; standalone files use relative assets.
+- player.ts / player.css: title screen, Play, score/balls, controls, pause/restart, game-over screen and fullscreen. No editor or storage dependency.
+- game-audio.ts: shared locally synthesized hit sounds, unlocked by user interaction. Audio failure leaves silent gameplay available.
+- scripts/build-player.mjs: builds a single IIFE and stylesheet from current shared sources, injected through virtual:pinball-player. No stale copied runtime or runtime CDN fetch. The editor static build also includes installed dependency license notices.
+
+ZIP creation retains all asset IDs and sequence links, including unused library assets. Export validation decodes all artwork before packaging. The last Blob download URL is retained for retry and revoked on replacement. A download request is described as ready, since browser confirmation can prevent finalization. Current ZIP export uses memory proportional to project assets; large-artwork stress testing remains outstanding.

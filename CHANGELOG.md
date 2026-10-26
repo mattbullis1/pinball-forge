@@ -42,3 +42,14 @@
 - Verified 51 automated checks, four 30-second simulation runs, real browser scoring/drain/restart/pause workflows and byte-identical animated-project preservation.
 - Recorded simulation CPU measurements and browser diagnostics. Physical tablet, Firefox/Safari, arbitrary extreme layouts and standalone player verification remain future checks.
 - No dependencies added, no deployment, and no web server or example.test configuration changes.
+
+## 0.5.0 — Standalone HTML5 export (2026-10-26)
+
+- Added DOWNLOAD MY PINBALL GAME with ZIP progress, artwork checking, failure feedback and a retry download link.
+- Added standalone title/Play, score, balls, touch/keyboard controls, pause/restart, game-over and fullscreen screens.
+- Bundled the same Matter.js physics, renderer, artwork layers, rules and synthesized sounds used by Test.
+- Preserved original image bytes, GIF/WebP playback, sprite sheets and sequences with relative asset paths.
+- Included runtime licenses and hosting instructions in each ZIP; editor builds include dependency notices.
+- Verified 65 tests, build, four standalone packages, the user's finalized browser download, Chrome tablet/narrow layouts and animation evidence.
+- Direct file:// was blocked by test tooling; physically disconnected Internet and physical tablet tests remain unverified.
+- Added isolated local web server export QA files without changing server/network settings or existing sites. Phase 5 remains gated.

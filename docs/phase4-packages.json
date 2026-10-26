@@ -1,0 +1,23 @@
+[
+  {
+    "name": "star-workshop",
+    "zipBytes": 96081,
+    "sha256": "372e0f650f7db8ac069669f057d2107804150928e971e51918ed64dd20ba3920",
+    "assetsCompared": 3,
+    "files": 9
+  },
+  {
+    "name": "artwork-laboratory",
+    "zipBytes": 106690,
+    "sha256": "eb3f8cc2ec43a6c01d6343c746f5f794a67adb7e8c57b472b7f70bc7052d6b6a",
+    "assetsCompared": 13,
+    "files": 19
+  },
+  {
+    "name": "drain-and-restart-check",
+    "zipBytes": 42449,
+    "sha256": "77de396a637fc25e450c0e967e5901710eb4fe37a167f70968b42fd5aacd5e3c",
+    "assetsCompared": 0,
+    "files": 6
+  }
+]
