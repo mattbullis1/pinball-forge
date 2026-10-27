@@ -1,5 +1,13 @@
 # Testing
 
+## Modern picture and scale pass — 2026-10-26
+
+`npm.cmd test`: **86 tests passed** in nine files. `npm.cmd run build`: TypeScript and Vite passed. New checks validate two independent picture references and fit modes, reject broken references, verify their exact bytes in the ZIP, and verify the polished component atlas in standalone output. `scripts/modern-qa.mjs` generated an independent **9-file, 7,864,492-byte** ZIP with **28 parts and two uploaded picture assets**; its CRC/inventory check passed.
+
+In the actual Chrome editor at `private-preview`, uploaded the sample table and headboard PNGs through their visible native file inputs, observed each preview and enabled fit/remove controls, then selected Polished appearance. The resulting screenshot is `docs/modern-editor-actual.png`: headboard left, full table, five-column palette right, locked top and right tools intact. An independently served package at `private-preview` loaded the same pictures and modern parts with the headboard right; screenshot `docs/modern-game-actual.png`.
+
+The original photos supplied by the user were used as proportion references, not pixel-perfect copying. Direct `file://`, a separate tablet device, and Firefox/Safari remain unverified. The editor production bundle is 3.23 MB of JavaScript (2.24 MB gzip) because it embeds the atlas for client-side ZIP export; reducing this cost is a remaining performance improvement.
+
 ## Phase 4 verification — 2026-10-26
 
 **65 tests pass** across seven files; TypeScript and Vite production build pass. Added ZIP CRC/inventory checks, exact original-image preservation, generated-path validation, escaping, three sample runtime-equivalence checks, actual player build/no-network-API checks, real artwork fixtures and editor-license packaging.

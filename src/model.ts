@@ -4,7 +4,8 @@ import {AdvancedKind,AdvancedSettings,AudioAsset,validAdvanced} from './advanced
 export type Kind = AdvancedKind|'artwork'|'wall'|'obstacle'|'bumper'|'leftFlipper'|'rightFlipper'|'launcher'|'slingshot'|'target'|'rollover'|'drain'|'light'|'zone'|'ball';
 export type Point = {x:number;y:number};
 export type Part = {id:string;kind:Kind;x:number;y:number;x2?:number;y2?:number;r?:number;color:string;score:number;rotation:number;boundary?:boolean;points?:Point[];scale?:number;mirror?:boolean;art?:Artwork;enabled?:boolean;animationPhase?:number};
-export type Table = {id:string;title:string;surface:string;wallColor:string;exterior?:string;parts:Part[];assets?:Record<string,Asset>;theme?:'classic'|'polished';advanced?:AdvancedSettings;sounds?:Record<string,AudioAsset>};
+export type Picture={assetId:string;fit:'cover'|'contain'};
+export type Table = {id:string;title:string;surface:string;wallColor:string;exterior?:string;parts:Part[];assets?:Record<string,Asset>;pictures?:{table?:Picture;headboard?:Picture};theme?:'classic'|'polished';advanced?:AdvancedSettings;sounds?:Record<string,AudioAsset>};
 export const W=560,H=840;
 export const palette:{kind:Kind;label:string;group:string;icon:string}[]=[
 {kind:'multiball',label:'Multiball gate',group:'Advanced',icon:'●'},
@@ -24,14 +25,14 @@ export const palette:{kind:Kind;label:string;group:string;icon:string}[]=[
 {kind:'drain',label:'Drain',group:'Action',icon:'⌄'},{kind:'light',label:'Light',group:'Decoration',icon:'✦'},{kind:'zone',label:'Scoring zone',group:'Action',icon:'◇'}];
 export const colors=['#f4f4ef','#63f21c','#a042ff','#ff8426','#42e7ef','#ff50dc','#050505'];
 export function uid(){return `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`}
-export function makePart(kind:Kind,x:number,y:number):Part{return {id:uid(),kind,x,y,...(kind==='wall'?{x2:x+100,y2:y}:{}),...(kind==='obstacle'?{points:[{x:-40,y:-35},{x:40,y:-35},{x:40,y:35},{x:-40,y:35}]}:{}),r:kind==='bumper'?27:kind==='ball'?10:kind==='light'?10:22,color:['bumper','slingshot','target','light'].includes(kind)?colors[2]:colors[0],score:['bumper','target','slingshot','rollover','zone'].includes(kind)?100:0,rotation:0,scale:1}}
+export function makePart(kind:Kind,x:number,y:number):Part{return {id:uid(),kind,x,y,...(kind==='wall'?{x2:x+100,y2:y}:{}),...(kind==='obstacle'?{points:[{x:-40,y:-35},{x:40,y:-35},{x:40,y:35},{x:-40,y:35}]}:{}),r:kind==='bumper'?20:kind==='ball'?10:kind==='light'?10:22,color:['bumper','slingshot','target','light'].includes(kind)?colors[2]:colors[0],score:['bumper','target','slingshot','rollover','zone'].includes(kind)?100:0,rotation:0,scale:1}}
 export type Preset={id:string;label:string;kind:Kind;changes?:Partial<Part>};
 export const presets:Preset[]=[
 {id:'leftFlipper',label:'Left flipper',kind:'leftFlipper'},{id:'rightFlipper',label:'Right flipper',kind:'rightFlipper'},
 {id:'smallLeft',label:'Small left flipper',kind:'leftFlipper',changes:{scale:.65}},{id:'smallRight',label:'Small right flipper',kind:'rightFlipper',changes:{scale:.65}},
 {id:'ball',label:'Pinball',kind:'ball'},{id:'wall',label:'Wall guide',kind:'wall'},
 {id:'obstacle',label:'Solid obstacle',kind:'obstacle',changes:{color:colors[2]}},{id:'wedge',label:'Wedge obstacle',kind:'obstacle',changes:{color:colors[1],points:[{x:-35,y:-40},{x:35,y:40},{x:-35,y:40}]}},
-{id:'bumper',label:'Bumper',kind:'bumper'},{id:'smallBumper',label:'Small bumper',kind:'bumper',changes:{r:18,color:colors[1]}},
+{id:'bumper',label:'Bumper',kind:'bumper'},{id:'smallBumper',label:'Small bumper',kind:'bumper',changes:{r:13,color:colors[1]}},
 {id:'slingshot',label:'Left slingshot',kind:'slingshot'},{id:'rightSling',label:'Right slingshot',kind:'slingshot',changes:{mirror:true}},
 {id:'target',label:'Target',kind:'target'},{id:'sideTarget',label:'Side target',kind:'target',changes:{rotation:90}},
 {id:'launcher',label:'Launcher',kind:'launcher'},{id:'drain',label:'Drain',kind:'drain'},
@@ -56,6 +57,7 @@ if(!value||typeof value!=='object')return false;const t=value as Table,hex=(v:un
 if(typeof t.id!=='string'||typeof t.title!=='string'||t.title.length>100||!hex(t.surface)||!hex(t.wallColor)||t.exterior!==undefined&&!hex(t.exterior)||!Array.isArray(t.parts)||t.parts.length>1000)return false;
 if(t.theme!==undefined&&!['classic','polished'].includes(t.theme))return false;
 if(t.assets!==undefined&&(!t.assets||typeof t.assets!=='object'||Array.isArray(t.assets)||Object.entries(t.assets).some(([id,a])=>!validAsset(a)||a.id!==id)))return false;
+if(t.pictures!==undefined){if(!t.pictures||typeof t.pictures!=='object'||Array.isArray(t.pictures))return false;for(const slot of ['table','headboard'] as const){const picture=t.pictures[slot];if(picture!==undefined&&(!picture||typeof picture.assetId!=='string'||!Object.hasOwn(t.assets??{},picture.assetId)||!['cover','contain'].includes(picture.fit)))return false}}
 const ids=new Set<string>();for(const p of t.parts){if(!p||typeof p.id!=='string'||ids.has(p.id)||!palette.some(k=>k.kind===p.kind)||![p.x,p.y,p.rotation,p.score].every(Number.isFinite)||p.score<0||p.score>1e9||!hex(p.color))return false;ids.add(p.id);if(p.kind==='artwork'&&!validArt(p.art!,t.assets??{}))return false;
 if(p.scale!==undefined&&(!Number.isFinite(p.scale)||p.scale<.4||p.scale>2))return false;if(p.r!==undefined&&(!Number.isFinite(p.r)||p.r<3||p.r>100))return false;
 if(p.boundary!==undefined&&typeof p.boundary!=='boolean'||p.boundary&&p.kind!=='wall')return false;

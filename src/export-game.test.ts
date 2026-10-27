@@ -26,6 +26,23 @@ describe('standalone ZIP contract',()=>{
  it('keeps every asset, including unused library images',async()=>{
   const t=newTable();t.assets={pixel:asset,second:{...asset,id:'second',name:'second'}};const {result}=await unpack(t);expect(result.assetCount).toBe(2);
  });
+ it('keeps separate table and headboard pictures in the editable table and standalone ZIP',async()=>{
+  const t=newTable();t.assets={pixel:asset,sign:{...asset,id:'sign',name:'headboard.png',data:'data:image/png;base64,BQYHCA=='}};
+  t.pictures={table:{assetId:'pixel',fit:'cover'},headboard:{assetId:'sign',fit:'contain'}};
+  const {result,zip,pack}=await unpack(t);
+  expect(result.assetCount).toBe(2);
+  expect(pack.table.pictures).toEqual(t.pictures);
+  expect(readGamePackage(pack).pictures).toEqual(t.pictures);
+  expect([...await zip.file('assets/image-0000.png')!.async('uint8array')]).toEqual([1,2,3,4]);
+  expect([...await zip.file('assets/image-0001.png')!.async('uint8array')]).toEqual([5,6,7,8]);
+  expect((await zip.file('table.js')!.async('string'))).not.toContain('data:image/png;base64');
+  const broken=structuredClone(t);broken.pictures!.headboard!.assetId='missing';await expect(createGameZip(broken,bundle)).rejects.toThrow('invalid');
+ });
+ it('ships its modern component artwork with polished tables',async()=>{
+  const t=newTable();t.theme='polished';const {zip,result}=await unpack(t);
+  expect(result.fileCount).toBe(7);
+  expect((await zip.file('modern-parts.png')!.async('uint8array')).length).toBeGreaterThan(100000);
+ });
  it('rejects broken projects and unavailable runtime before producing a ZIP',async()=>{
   const t=newTable();t.parts[0].x=NaN;await expect(createGameZip(t,bundle)).rejects.toThrow('invalid');await expect(createGameZip(newTable(),{...bundle,javascript:''})).rejects.toThrow('unavailable');
  });

@@ -15,7 +15,7 @@ describe('complete artwork exports',()=>{
   const zip=await JSZip.loadAsync(result.bytes,{checkCRC32:true});
   const text=await zip.file('table.js').async('string');
   const data=JSON.parse(text.slice('window.PINBALL_FORGE_GAME = '.length).trim().slice(0,-1));
-  const loaded=readGamePackage(data);expect(loaded.parts).toEqual(table.parts);expect(result.assetCount).toBe(count);expect(result.fileCount).toBe(6+count);
+  const loaded=readGamePackage(data);expect(loaded.parts).toEqual(table.parts);expect(result.assetCount).toBe(count);expect(result.fileCount).toBe(6+count+(table.theme==='polished'?1:0));
   for(const [id,asset] of Object.entries(table.assets??{})){
    const bytes=await zip.file(loaded.assets[id].data).async('nodebuffer');
    expect(bytes.equals(Buffer.from(asset.data.split(',')[1],'base64'))).toBe(true);

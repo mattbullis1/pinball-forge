@@ -1,5 +1,13 @@
 # Changelog
 
+## Modern graphics and two-picture layout (2026-10-26)
+
+- Moved the editor headboard preview to the left and expanded the right parts box to five columns, while preserving the locked header, colors and pop-in menus.
+- Added separate native file controls for a playfield background and a headboard sign, with fit/remove options; pictures save in projects and ship in standalone ZIPs.
+- Added original nebula and headboard examples plus a transparent chrome component atlas. Polished walls, obstacles, launcher and drain use matching metallic rendering.
+- Reduced new bumper presets while preserving the dimensions of previously saved tables. The table scales to fit the editor's screen height; the standalone game keeps its headboard on the right.
+- Checked actual editor imports and an independent exported game through example.test. No web server or network configuration changed.
+
 ## 0.1.0 — Phase 1 preview
 
 - Added isolated TypeScript/Vite project and Git repository.

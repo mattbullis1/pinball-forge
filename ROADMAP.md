@@ -1,6 +1,6 @@
 # Roadmap
 
-**Current review priority:** the user approved and locked the header/menu, right-side color/tool column and pop-in menus, but rejected the current degree of graphics fidelity. Prepare a reference-matched visual proposal before further feature phases or a graphics redesign. See AGENTS.md and docs/FAITHFUL-WORKBENCH.md. No application code changes authorized by this design discussion.
+**Current review priority:** the user approved a modern graphics direction while keeping the header/menu, far-right color/tool column and pop-in menus locked. The editor now places the headboard picture at left, keeps the full table visible at normal desktop height, and uses a five-column parts box. The standalone game places the headboard at right. Two independently uploaded pictures and original chrome component art are implemented for review. See docs/modern-editor-actual.png and docs/modern-game-actual.png. Physical tablet and other-browser checks remain.
 
 - Phase 0: research and architecture recommendation — previously reviewed.
 - Phase 1: faithful construction revision — implemented for user review. Wall sculpting, solid obstacles, painting, three samples, browser/file saving, undo/redo, and Test. Physical tablet testing and a committed UI regression suite remain outstanding.

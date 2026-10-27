@@ -1,5 +1,13 @@
 # PINBALL FORGE
 
+## Modern picture layout
+
+The editor shows the headboard picture to the **left** of the playfield, leaving a wider five-column parts box on the right. The whole playfield scales to the available screen height. In Test and in the standalone game, the headboard is **right** of the playfield. The header/menu, far-right color tools, and pop-in menus retain their established layout.
+
+Choose **Table picture** for a playfield background and **Headboard picture** for the sign. Each accepts a local PNG, JPG, WebP or GIF, has Crop to fill / Show whole picture and Remove controls, and saves with the editable project. No upload service is used. The picture goes in the standalone ZIP alongside the shared game runtime. The sample pictures are in [examples/artwork](examples/artwork); the complete editable sample is [Modern Space](examples/modern-space.pinball.json). Choose Table → Appearance → Polished for the original chrome and illuminated component set. Newly placed bumpers are smaller to leave space for customizing the table. Existing saved bumpers retain their dimensions.
+
+See the [actual editor](docs/modern-editor-actual.png) and [standalone game](docs/modern-game-actual.png). The [layout proposal](docs/modern-graphics-proposal-v3.png) is a visual target; the actual screenshots show the implemented result.
+
 A browser construction set inspired by Bill Budge's Apple II workbench: table on the left, parts box on the right, and direct manipulation with a mouse or touch. The faithful workbench includes artwork, animation, refined playtesting and standalone HTML5 ZIP export. Later roadmap phases remain separate approval gates.
 
 ## Run on development machine

@@ -1,5 +1,13 @@
 # Architecture
 
+## Modern picture and component pass
+
+- `pictures.ts` binds two independent local picture slots to asset IDs in the table model. It uses the existing raster importer, history snapshots, project storage, and ZIP asset path. The table picture is clipped to the editable perimeter. Images are visual layers only and do not alter collisions.
+- `pictures.css` lays out the editor with the headboard at left and five palette columns on wide screens. The player keeps its sign and scoreboard on the right. The locked top navigation, color/tool strip, and property drawers are untouched.
+- `modern-parts.ts` draws original raster sprites for flippers, ball, bumpers, slingshots, target, and light. `polished.ts` draws metallic walls, adjustable solid shapes, drain, and launcher. Geometry and Matter.js bodies remain shared with Classic.
+- `src/assets/modern-parts.png` is the authored source atlas, `public/modern-parts.png` serves the static editor, and `export-game.ts` includes the same bytes in each polished standalone ZIP. The exported runtime resolves its atlas and both user pictures by relative paths, without an editor or CDN.
+- `scripts/modern-qa.mjs` makes a self-contained sample and independent ZIP for local HTTP verification. Its web server QA output is separate from existing sites and does not require server configuration changes.
+
 - `main.ts` loads `editor.ts`, which manages DOM controls, pointer interaction, painting, play/edit transitions, and persistence.
 - `model.ts` defines serializable components, 20 working palette presets, three sample tables, and import validation. Valid older segment-based tables remain readable; exterior color is optional for compatibility.
 - `geometry.ts` supplies transforms, mirrored shapes, hit detection, connected-boundary operations, validity checks, and triangle decomposition. Rendering and Matter bodies use the same polygon points.

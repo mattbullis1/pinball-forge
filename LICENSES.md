@@ -1,5 +1,9 @@
 # Licenses
 
+## Modern graphics pass
+
+The new nebula table image, PINBALL FORGE headboard image, and transparent chrome component atlas were generated specifically for this project. They are included as editable examples and project artwork, with no downloaded commercial sprite sheets or historical game images. The screenshots supplied by the user were visual references and are not bundled into exported games. The generated project artwork is distributed with this repository under its MIT license. User-uploaded pictures remain subject to their owners' rights; exporting a game packages their exact image bytes.
+
 PINBALL FORGE application code is original work in this repository and is licensed under the MIT license in `LICENSE`.
 
 - Matter.js: MIT license. The dependency's license text is in `node_modules/matter-js/LICENSE` after installation.

@@ -2,11 +2,12 @@ import {H,Part,Point,Table,W} from './model';
 import {end,perimeter,shape,vertices} from './geometry';
 import {drawPolished,surface,effects} from './polished';
 import {drawAdvanced} from './advanced-draw';
+import {drawModern} from './modern-parts';
 import type {Burst} from './game-rules';
 const WHITE='#f4f4ef',BLACK='#050505';
 function path(c:CanvasRenderingContext2D,v:Point[]){c.beginPath();if(!v.length)return;c.moveTo(v[0].x,v[0].y);v.slice(1).forEach(p=>c.lineTo(p.x,p.y));c.closePath()}
 export function drawPart(c:CanvasRenderingContext2D,p:Part,flash=false,polished=false){
- if(p.kind==='artwork')return;flash ||= p.animationPhase===-1;if(drawAdvanced(c,p,flash))return;if(p.enabled===false){c.save();c.globalAlpha=.25;drawPart(c,{...p,enabled:true},false,polished);c.restore();return}if(polished&&drawPolished(c,p,flash))return;
+ if(p.kind==='artwork')return;flash ||= p.animationPhase===-1;if(drawAdvanced(c,p,flash))return;if(p.enabled===false){c.save();c.globalAlpha=.25;drawPart(c,{...p,enabled:true},false,polished);c.restore();return}if(polished&&(drawModern(c,p,flash)||drawPolished(c,p,flash)))return;
  c.save();c.lineWidth=3;c.lineCap='square';c.lineJoin='miter';c.strokeStyle=WHITE;c.fillStyle=flash?WHITE:p.color;
  if(p.kind==='wall'){c.strokeStyle=flash?WHITE:p.color;c.lineWidth=p.boundary?4:7;c.beginPath();c.moveTo(p.x,p.y);c.lineTo(end(p).x,end(p).y);c.stroke()}
  else if(['obstacle','slingshot','leftFlipper','rightFlipper','target','drain'].includes(p.kind)){
@@ -30,7 +31,7 @@ export function drawTable(ctx:CanvasRenderingContext2D,t:Table,o:ViewOptions={})
  // The separate background canvas lets native animated images sit beneath the game pieces.
  if(o.grid&&!o.testing){c.fillStyle='#ffffff22';for(let x=20;x<W;x+=20)for(let y=20;y<H;y+=20){c.fillRect(x,y,1,1)}}
  for(const p of o.gameParts??t.parts){if(o.testing&&p.kind==='ball')continue;drawPart(c,p,p.id===o.flash,polished)}
- for(const ball of o.balls??(o.ball?[o.ball]:[])){if(polished)drawPolished(c,{id:'runtime-ball',kind:'ball',...ball,r:10,color:WHITE,score:0,rotation:0});else{c.fillStyle=WHITE;c.beginPath();c.arc(ball.x,ball.y,10,0,7);c.fill()}}
+ for(const ball of o.balls??(o.ball?[o.ball]:[])){if(polished){const part:Part={id:'runtime-ball',kind:'ball',...ball,r:10,color:WHITE,score:0,rotation:0};if(!drawModern(c,part))drawPolished(c,part)}else{c.fillStyle=WHITE;c.beginPath();c.arc(ball.x,ball.y,10,0,7);c.fill()}}
  if(polished)effects(c,t,o.flash,o.testing);
  for(const b of o.bursts??[]){const age=((o.elapsed??0)-b.start)/700;c.save();c.globalAlpha=Math.max(0,1-age);c.fillStyle=b.color;for(let i=0;i<16;i++){const a=i*Math.PI/8;c.fillRect(b.x+Math.cos(a)*age*90-2,b.y+Math.sin(a)*age*90-2,4,4)}c.restore()}
  if(!o.testing){
@@ -42,6 +43,6 @@ export function drawTable(ctx:CanvasRenderingContext2D,t:Table,o:ViewOptions={})
  }
  ctx.imageSmoothingEnabled=polished;ctx.clearRect(0,0,W,H);ctx.drawImage(buffer,0,0,W,H);
 }
-export function drawThumbnail(canvas:HTMLCanvasElement,p:Part){canvas.width=96;canvas.height=80;const c=canvas.getContext('2d')!;c.translate(48,40);c.scale(.8,.8);const q={...p,x:0,y:0};if(q.kind==='wall'){q.x=-35;q.y=15;q.x2=35;q.y2=-15}if(q.kind==='leftFlipper')q.x=-30;if(q.kind==='rightFlipper')q.x=30;drawPart(c,q)}
+export function drawThumbnail(canvas:HTMLCanvasElement,p:Part){canvas.width=96;canvas.height=80;const c=canvas.getContext('2d')!;c.translate(48,40);c.scale(.8,.8);const q={...p,x:0,y:0};if(q.kind==='wall'){q.x=-35;q.y=15;q.x2=35;q.y2=-15}if(q.kind==='leftFlipper')q.x=-30;if(q.kind==='rightFlipper')q.x=30;drawPart(c,q,false,true)}
 
 export function drawBackground(ctx:CanvasRenderingContext2D,t:Table){ctx.clearRect(0,0,W,H);surface(ctx,t)}

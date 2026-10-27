@@ -7,17 +7,18 @@ import {ArtworkLayers,checkArtwork} from './artwork';
 import {FlipperInput} from './play-input';
 import {GameAudio} from './game-audio';
 import {measureRender,measureSimulation} from './diagnostics';
+import {syncPicture} from './pictures';
 
 async function boot(){
  const table=readGamePackage((window as Window&{PINBALL_FORGE_GAME?:unknown}).PINBALL_FORGE_GAME);
  await checkArtwork(table);
  const root=document.querySelector<HTMLElement>('#player')!;
  root.innerHTML=`<header><p class="brand">PINBALL FORGE</p><h1 id="title"></h1><button id="fullscreen">Fullscreen</button></header>
- <main class="layout"><section class="stage" aria-label="Pinball game"><div class="board"><canvas id="background" width="560" height="840" aria-hidden="true"></canvas><div class="art-layer" id="art-back" aria-hidden="true"></div><canvas id="canvas" width="560" height="840" tabindex="0" aria-label="Pinball playfield"></canvas><div class="art-layer" id="art-front" aria-hidden="true"></div>
+ <main class="layout"><section class="stage" aria-label="Pinball game"><div class="board"><canvas id="background" width="560" height="840" aria-hidden="true"></canvas><img id="table-picture-image" class="table-picture-image" alt="" hidden><div class="art-layer" id="art-back" aria-hidden="true"></div><canvas id="canvas" width="560" height="840" tabindex="0" aria-label="Pinball playfield"></canvas><div class="art-layer" id="art-front" aria-hidden="true"></div>
  <section class="overlay" id="welcome" aria-label="Title screen"><p class="eyebrow">YOUR PINBALL GAME</p><h2 id="welcome-title"></h2><button id="play" class="primary">Play</button><p>Left Shift · Right Shift<br>Space to launch</p><p class="small">Or use the touch buttons below.</p></section>
  <section class="overlay" id="gameover" aria-label="Game over" hidden><h2>GAME OVER</h2><p>FINAL SCORE</p><output id="final-score">0</output><button id="play-again" class="primary">Play again</button></section></div>
  <div id="touch-play" aria-label="Touch controls"><button id="left" disabled>Left flipper</button><button id="launch" disabled>Launch</button><button id="right" disabled>Right flipper</button></div></section>
- <aside id="scoreboard" aria-label="Scoreboard"><div class="readout"><p>SCORE</p><output id="score">00000000</output><p>BALLS REMAINING</p><output id="balls">● ● ●</output></div><p id="advanced-status" role="status"></p><p id="game-state" role="status">Ready to play</p><button id="pause" disabled>Pause</button><button id="restart" disabled>Restart</button><label class="sound"><input id="sound" type="checkbox" checked> Sound</label><p class="small">Left Shift / Right Shift: flippers<br>Space: launch<br>Three balls. Make them count.</p></aside></main><footer><span id="message" role="status"></span><span>Made with PINBALL FORGE</span></footer>`;
+ <aside id="scoreboard" aria-label="Scoreboard"><img id="headboard-picture-image" class="headboard-picture-image" alt="" hidden><div class="readout"><p>SCORE</p><output id="score">00000000</output><p>BALLS REMAINING</p><output id="balls">● ● ●</output></div><p id="advanced-status" role="status"></p><p id="game-state" role="status">Ready to play</p><button id="pause" disabled>Pause</button><button id="restart" disabled>Restart</button><label class="sound"><input id="sound" type="checkbox" checked> Sound</label><p class="small">Left Shift / Right Shift: flippers<br>Space: launch<br>Three balls. Make them count.</p></aside></main><footer><span id="message" role="status"></span><span>Made with PINBALL FORGE</span></footer>`;
  root.classList.toggle('polished',table.theme==='polished');
  const $=<T extends HTMLElement=HTMLElement>(id:string)=>root.querySelector<T>('#'+id)!;
  const canvas=$<HTMLCanvasElement>('canvas'),ctx=canvas.getContext('2d')!;
@@ -26,6 +27,8 @@ async function boot(){
  const audio=new GameAudio(()=>$<HTMLInputElement>('sound').checked,message=>$('message').textContent=message);
  const artwork=new ArtworkLayers($('art-back'),$('art-front'));
  drawBackground($<HTMLCanvasElement>('background').getContext('2d')!,table);
+ syncPicture($<HTMLImageElement>('table-picture-image'),table,'table');
+ syncPicture($<HTMLImageElement>('headboard-picture-image'),table,'headboard');
  artwork.sync(table,undefined,true);
  let game:Game|undefined,last=performance.now(),over=false;
  const input=new FlipperInput((left,right)=>game?.flippers(left,right));
