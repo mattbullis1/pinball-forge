@@ -1,8 +1,9 @@
-import {Part,Point,Table,W,H} from './model';
+import {Part,Point,Table,tableSize} from './model';
 import {shape,end,perimeter} from './geometry';
 function polygon(c:CanvasRenderingContext2D,v:Point[]){c.beginPath();v.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath()}
 export function surface(c:CanvasRenderingContext2D,t:Table){
- c.fillStyle=t.exterior??'#63f21c';c.fillRect(0,0,W,H);const v=perimeter(t);c.save();if(v.length){polygon(c,v);c.clip()}
+ const {width:W,height:H}=tableSize(t);
+ c.fillStyle='#000000';c.fillRect(0,0,W,H);c.fillStyle=t.exterior??'#63f21c';if(t.playfield==='reference')c.fillRect(4,4,W-4,H-12);else c.fillRect(0,0,W,H);const v=perimeter(t);c.save();if(v.length){polygon(c,v);c.clip()}
  c.fillStyle=t.surface;c.fillRect(0,0,W,H);
  if(t.theme==='polished'){const g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,'#ffffff19');g.addColorStop(.4,'#ffffff02');g.addColorStop(1,'#00000077');c.fillStyle=g;c.fillRect(0,0,W,H);c.strokeStyle='#ffffff08';c.lineWidth=1;for(let y=0;y<H;y+=8){c.beginPath();c.moveTo(0,y);c.lineTo(W,y+90);c.stroke()}}
  c.restore();

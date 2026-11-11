@@ -1,0 +1,15 @@
+{
+  "url": "private-preview",
+  "mouseAndTouchPointDrag": true,
+  "continuousUpdates": 6,
+  "pointInsertion": true,
+  "independentBoxes": true,
+  "zigzag": true,
+  "boundaryIsolation": true,
+  "activePointHighlight": true,
+  "undoRedo": true,
+  "saveOpen": true,
+  "projectRoundTrip": true,
+  "exportedGame": true,
+  "errors": []
+}

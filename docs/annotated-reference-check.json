@@ -1,0 +1,232 @@
+{
+  "url": "private-preview",
+  "parts": [
+    {
+      "id": "smallLeft",
+      "label": "Small left flipper"
+    },
+    {
+      "id": "smallRight",
+      "label": "Small right flipper"
+    },
+    {
+      "id": "leftFlipper",
+      "label": "Left flipper"
+    },
+    {
+      "id": "rightFlipper",
+      "label": "Right flipper"
+    },
+    {
+      "id": "ball",
+      "label": "Pinball"
+    },
+    {
+      "id": "wall",
+      "label": "Wall guide"
+    },
+    {
+      "id": "shortWall",
+      "label": "Short wall"
+    },
+    {
+      "id": "angledWall",
+      "label": "Angled wall"
+    },
+    {
+      "id": "reverseWall",
+      "label": "Opposite angled wall"
+    },
+    {
+      "id": "bumper",
+      "label": "Bumper"
+    },
+    {
+      "id": "smallBumper",
+      "label": "Small bumper"
+    },
+    {
+      "id": "sideTarget",
+      "label": "Upright target"
+    },
+    {
+      "id": "target",
+      "label": "Horizontal target"
+    },
+    {
+      "id": "leftTarget",
+      "label": "Left angled target"
+    },
+    {
+      "id": "rightTarget",
+      "label": "Right angled target"
+    },
+    {
+      "id": "slingshot",
+      "label": "Left slingshot"
+    },
+    {
+      "id": "rightSling",
+      "label": "Right slingshot"
+    },
+    {
+      "id": "upSpring",
+      "label": "Upward spring"
+    },
+    {
+      "id": "sideSpring",
+      "label": "Two-way spring"
+    },
+    {
+      "id": "launcher",
+      "label": "Starting plunger"
+    },
+    {
+      "id": "bounceVertical",
+      "label": "Vertical flashing rebound wall"
+    },
+    {
+      "id": "bounceHorizontal",
+      "label": "Horizontal flashing rebound wall"
+    },
+    {
+      "id": "ballTrap",
+      "label": "Three-ball trap"
+    },
+    {
+      "id": "blackHole",
+      "label": "Black hole"
+    },
+    {
+      "id": "classicSpinner",
+      "label": "Spinner"
+    },
+    {
+      "id": "classicMagnet",
+      "label": "Magnet"
+    },
+    {
+      "id": "greenLight",
+      "label": "Tall green light"
+    },
+    {
+      "id": "mediumLight",
+      "label": "Medium green light"
+    },
+    {
+      "id": "smallLight",
+      "label": "Small green light"
+    },
+    {
+      "id": "gateUpLeft",
+      "label": "Upward gate, left hinge"
+    },
+    {
+      "id": "gateUpRight",
+      "label": "Upward gate, right hinge"
+    },
+    {
+      "id": "gateRight",
+      "label": "Rightward gate"
+    },
+    {
+      "id": "gateLeft",
+      "label": "Leftward gate"
+    },
+    {
+      "id": "rollBall",
+      "label": "Round rollover light"
+    },
+    {
+      "id": "rollPinkPlus",
+      "label": "Pink cross rollover light"
+    },
+    {
+      "id": "rollOrangePlus",
+      "label": "Orange cross rollover light"
+    },
+    {
+      "id": "rollWhiteBar",
+      "label": "White horizontal rollover light"
+    },
+    {
+      "id": "rollGreenBar",
+      "label": "Green horizontal rollover light"
+    },
+    {
+      "id": "rollCyanBar",
+      "label": "Cyan horizontal rollover light"
+    },
+    {
+      "id": "rollWhiteVertical",
+      "label": "White upright rollover light"
+    },
+    {
+      "id": "rollPinkVertical",
+      "label": "Pink upright rollover light"
+    },
+    {
+      "id": "rollOrangeVertical",
+      "label": "Orange upright rollover light"
+    }
+  ],
+  "placed": 42,
+  "touch": true,
+  "undoRedo": true,
+  "projectRoundTrip": true,
+  "playtestPreservesProject": true,
+  "exportedPlayer": true,
+  "lockedSections": [
+    "header",
+    "headboard",
+    "colors"
+  ],
+  "game": {
+    "state": "playing",
+    "elapsedMs": 1208.3333333333342,
+    "score": 100,
+    "balls": 3,
+    "ball": {
+      "x": 285.06812573706145,
+      "y": 171.25264704404844
+    },
+    "velocity": {
+      "x": 3.0258375568746487,
+      "y": -0.7030313899185785
+    },
+    "canLaunch": false,
+    "advanced": {
+      "activeBalls": 1,
+      "multiplier": 1,
+      "bonusSeconds": 0,
+      "combo": 0,
+      "missions": [
+        {
+          "title": "Two lights",
+          "hits": 0,
+          "total": 2,
+          "complete": false
+        }
+      ]
+    },
+    "flippers": [
+      {
+        "kind": "leftFlipper",
+        "angle": -40.10704565915762
+      },
+      {
+        "kind": "rightFlipper",
+        "angle": 40.10704565915762
+      },
+      {
+        "kind": "leftFlipper",
+        "angle": -40.10704565915762
+      },
+      {
+        "kind": "rightFlipper",
+        "angle": 40.10704565915762
+      }
+    ]
+  },
+  "errors": []
+}

@@ -1,0 +1,54 @@
+{
+  "url": "private-preview",
+  "editor": {
+    "independentButtons": true,
+    "bothTogether": true,
+    "releaseOutside": true,
+    "keyboardAndTouch": true,
+    "blurAndResume": true,
+    "contextMenuSuppressed": true
+  },
+  "exportedGame": {
+    "independentButtons": true,
+    "bothTogether": true,
+    "releaseOutside": true,
+    "keyboardAndTouch": true,
+    "blurAndResume": true,
+    "contextMenuSuppressed": true
+  },
+  "editorAudio": {
+    "states": [
+      "running"
+    ],
+    "frequencies": [
+      880,
+      2428.7999999999997,
+      1046,
+      2886.9599999999996,
+      180,
+      740,
+      1720
+    ],
+    "peak": 0.14484646916389465,
+    "mute": true,
+    "unmute": true
+  },
+  "exportedAudio": {
+    "states": [
+      "running"
+    ],
+    "frequencies": [
+      880,
+      2428.7999999999997,
+      1046,
+      2886.9599999999996,
+      180,
+      740,
+      1720
+    ],
+    "peak": 0.15764915943145752,
+    "mute": true,
+    "unmute": true
+  },
+  "errors": []
+}

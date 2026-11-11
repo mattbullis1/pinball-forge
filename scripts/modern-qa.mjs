@@ -6,7 +6,7 @@ import JSZip from 'jszip';
 import {buildPlayer} from './build-player.mjs';
 
 await mkdir('.qa',{recursive:true});
-await build({stdin:{contents:"export {sampleTables} from './src/model';export {createGameZip} from './src/export-game';",resolveDir:process.cwd()},bundle:true,platform:'node',format:'esm',packages:'external',loader:{'.png':'dataurl'},outfile:'.qa/modern-api.mjs'});
+await build({stdin:{contents:"export {sampleTables} from './src/model';export {createGameZip} from './src/export-game';",resolveDir:process.cwd()},bundle:true,platform:'node',format:'esm',packages:'external',loader:{'.png':'dataurl','.gif':'dataurl'},outfile:'.qa/modern-api.mjs'});
 const {sampleTables,createGameZip}=await import('../.qa/modern-api.mjs?'+Date.now());
 const table=sampleTables()[0];table.title='Modern Space';table.theme='polished';table.surface='#071020';table.exterior='#152132';table.wallColor='#aacbe2';
 table.parts.filter(p=>p.boundary).forEach(p=>p.color='#42e7ef');

@@ -1,0 +1,54 @@
+{
+  "url": "private-preview",
+  "layouts": [
+    {
+      "viewport": {
+        "width": 1280,
+        "height": 900
+      },
+      "width": 616,
+      "height": 768,
+      "displayWidth": 468,
+      "displayHeight": 583.46875,
+      "overflow": false
+    },
+    {
+      "viewport": {
+        "width": 800,
+        "height": 1000
+      },
+      "width": 616,
+      "height": 768,
+      "displayWidth": 391.53125,
+      "displayHeight": 488.140625,
+      "overflow": false
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "width": 616,
+      "height": 768,
+      "displayWidth": 360,
+      "displayHeight": 448.828125,
+      "overflow": false
+    }
+  ],
+  "legacyRoundTrip": true,
+  "referenceRoundTrip": true,
+  "artworkAlignmentAndFit": true,
+  "pictures": true,
+  "boundaryComparison": {
+    "agreement": 0.9981277233115469,
+    "mismatchedPixels": 220,
+    "comparedPixels": 117504,
+    "exclusion": "32 x 24 unidentified top-left corner symbol; compares green/black region membership, not exact color"
+  },
+  "backgroundRender": {
+    "samples": 60,
+    "averageMs": 9.276666661103567,
+    "p95Ms": 12.5
+  },
+  "errors": []
+}

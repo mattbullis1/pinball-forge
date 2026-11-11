@@ -15,7 +15,7 @@ export class GameRules {
  tick(now:number){this.now=now;this.bursts=this.bursts.filter(b=>now-b.start<700);if(now-this.lastCombo>2000)this.combo=0}
  multiplier(){return this.now<this.bonusUntil?2:1}
  bonus(){this.bonusUntil=this.now+10000}
- flash(id:string){this.flashes.set(id,this.now+900)}
+ flash(id:string,duration=900){this.flashes.set(id,this.now+duration)}
  flashing(id:string){return (this.flashes.get(id)??0)>this.now}
  effect(p:Part){this.bursts.push({x:p.x,y:p.y,color:p.color,start:this.now})}
  effects(){return this.bursts.map(b=>({...b}))}

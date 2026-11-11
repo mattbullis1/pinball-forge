@@ -1,7 +1,7 @@
 import Matter from 'matter-js';
 import {afterEach,describe,it,expect,vi} from 'vitest';
 import {createGame,Game,TICK_MS,MAX_BALL_SPEED} from './physics';
-import {makePart,newTable,sampleTables,Part} from './model';
+import {fromPreset,makePart,newTable,sampleTables,Part} from './model';
 import {FlipperInput} from './play-input';
 import {moveVertex,project,shape} from './geometry';
 const games:Game[]=[];
@@ -15,6 +15,37 @@ function rig(parts:Part[]){
  return {game,body,engine,hit};
 }
 function run(g:Game,ticks:number){for(let i=0;i<ticks;i++)g.step(TICK_MS)}
+
+describe('confirmed construction-set pieces',()=>{
+ it('kicks upward on the first spring top, with passive sides and bottom',()=>{
+  for(const [x,y,vx,vy,active] of [[280,262,0,7,true],[250,300,7,0,false],[280,338,0,-7,false]] as const){
+   const {game,body}=rig([makePart('ball',x,y),fromPreset('upSpring',280,300)]);
+   Matter.Body.setVelocity(body(),{x:vx,y:vy});run(game,5);
+   if(active)expect(game.snapshot().velocity!.y).toBeLessThan(-12);
+   else expect(game.snapshot().velocity!.y).toBeGreaterThan(-10);
+  }
+ });
+ it.each([-1,1])('kicks outward from side %s of the horizontal spring',side=>{
+  const {game,body}=rig([makePart('ball',280+side*66,300),fromPreset('sideSpring',280,300)]);
+  Matter.Body.setVelocity(body(),{x:-side*10,y:0});run(game,10);
+  expect(game.snapshot().velocity!.x*side).toBeGreaterThan(12);
+ });
+ it('holds a served ball on the starting plunger until launch',()=>{
+  const {game}=rig([fromPreset('launcher',280,500)]);run(game,120);
+  expect(game.ball()!.y).toBeCloseTo(466,0);expect(game.snapshot().canLaunch).toBe(true);
+  game.launch();run(game,4);expect(game.ball()!.y).toBeLessThan(430);expect(game.snapshot().velocity!.y).toBeLessThan(-18);
+ });
+ it('crosses each bottom rollover without bouncing and awards once per crossing',()=>{
+  const ids=['rollBall','rollPinkPlus','rollOrangePlus','rollWhiteBar','rollGreenBar','rollCyanBar','rollWhiteVertical','rollPinkVertical','rollOrangeVertical'];
+  for(const id of ids){
+   const {game,body}=rig([makePart('ball',280,250),{...fromPreset(id,280,300),score:250}]);
+   Matter.Body.setVelocity(body(),{x:0,y:8});run(game,20);
+   expect(game.ball()!.y,id).toBeGreaterThan(325);expect(game.snapshot().velocity!.y,id).toBeGreaterThan(0);expect(game.score(),id).toBe(250);
+   Matter.Body.setPosition(body(),{x:280,y:250});Matter.Body.setVelocity(body(),{x:0,y:8});run(game,20);
+   expect(game.score(),id).toBe(500);
+  }
+ });
+});
 
 describe('fixed game clock and lifecycle',()=>{
  it('produces the same ball and flipper results on 30, 60, 120 and 144 Hz displays',()=>{

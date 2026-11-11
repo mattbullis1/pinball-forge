@@ -1,0 +1,189 @@
+{
+  "url": "private-preview",
+  "parts": [
+    {
+      "id": "smallLeft",
+      "label": "Small left flipper"
+    },
+    {
+      "id": "smallRight",
+      "label": "Small right flipper"
+    },
+    {
+      "id": "leftFlipper",
+      "label": "Left flipper"
+    },
+    {
+      "id": "rightFlipper",
+      "label": "Right flipper"
+    },
+    {
+      "id": "ball",
+      "label": "Pinball"
+    },
+    {
+      "id": "wall",
+      "label": "Wall guide"
+    },
+    {
+      "id": "shortWall",
+      "label": "Short wall"
+    },
+    {
+      "id": "angledWall",
+      "label": "Angled wall"
+    },
+    {
+      "id": "reverseWall",
+      "label": "Opposite angled wall"
+    },
+    {
+      "id": "bumper",
+      "label": "Bumper"
+    },
+    {
+      "id": "smallBumper",
+      "label": "Small bumper"
+    },
+    {
+      "id": "sideTarget",
+      "label": "Upright target"
+    },
+    {
+      "id": "target",
+      "label": "Horizontal target"
+    },
+    {
+      "id": "leftTarget",
+      "label": "Left angled target"
+    },
+    {
+      "id": "rightTarget",
+      "label": "Right angled target"
+    },
+    {
+      "id": "slingshot",
+      "label": "Left slingshot"
+    },
+    {
+      "id": "rightSling",
+      "label": "Right slingshot"
+    },
+    {
+      "id": "upSpring",
+      "label": "Upward spring"
+    },
+    {
+      "id": "sideSpring",
+      "label": "Two-way spring"
+    },
+    {
+      "id": "launcher",
+      "label": "Starting plunger"
+    },
+    {
+      "id": "classicMagnet",
+      "label": "Magnet"
+    },
+    {
+      "id": "greenLight",
+      "label": "Tall green light"
+    },
+    {
+      "id": "mediumLight",
+      "label": "Medium green light"
+    },
+    {
+      "id": "smallLight",
+      "label": "Small green light"
+    },
+    {
+      "id": "rollBall",
+      "label": "Round rollover light"
+    },
+    {
+      "id": "rollPinkPlus",
+      "label": "Pink cross rollover light"
+    },
+    {
+      "id": "rollOrangePlus",
+      "label": "Orange cross rollover light"
+    },
+    {
+      "id": "rollWhiteBar",
+      "label": "White horizontal rollover light"
+    },
+    {
+      "id": "rollGreenBar",
+      "label": "Green horizontal rollover light"
+    },
+    {
+      "id": "rollCyanBar",
+      "label": "Cyan horizontal rollover light"
+    },
+    {
+      "id": "rollWhiteVertical",
+      "label": "White upright rollover light"
+    },
+    {
+      "id": "rollPinkVertical",
+      "label": "Pink upright rollover light"
+    },
+    {
+      "id": "rollOrangeVertical",
+      "label": "Orange upright rollover light"
+    }
+  ],
+  "placed": 33,
+  "touch": true,
+  "undoRedo": true,
+  "projectRoundTrip": true,
+  "playtestPreservesProject": true,
+  "exportedPlayer": true,
+  "lockedSections": [
+    "header",
+    "headboard",
+    "tools"
+  ],
+  "game": {
+    "state": "playing",
+    "elapsedMs": 1208.3333333333342,
+    "score": 200,
+    "balls": 3,
+    "ball": {
+      "x": 161.14007094266915,
+      "y": 296.3446943029916
+    },
+    "velocity": {
+      "x": 5.488110446833616,
+      "y": -6.54573350344117
+    },
+    "canLaunch": false,
+    "advanced": {
+      "activeBalls": 1,
+      "multiplier": 1,
+      "bonusSeconds": 0,
+      "combo": 0,
+      "missions": []
+    },
+    "flippers": [
+      {
+        "kind": "leftFlipper",
+        "angle": -40.10704565915762
+      },
+      {
+        "kind": "rightFlipper",
+        "angle": 40.10704565915762
+      },
+      {
+        "kind": "leftFlipper",
+        "angle": -40.10704565915762
+      },
+      {
+        "kind": "rightFlipper",
+        "angle": 40.10704565915762
+      }
+    ]
+  },
+  "errors": []
+}

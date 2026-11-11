@@ -1,5 +1,57 @@
 # Testing
 
+## Catcher, audio and mouse flippers — 2026-11-02
+
+156 tests across 13 files and the production build pass. Chromium verified independent mouse buttons, simultaneous holds, outside release, keyboard/touch coexistence and focus recovery in editor and standalone export. Browser audio output, mute and unmute passed for lights, rollovers and bumpers. Desktop/tablet-width screenshots were inspected. See [the focused report](docs/GAMEPLAY-FIXES.md) for modified files, evidence and physical-device limitations.
+
+## Wall point editing — 2026-10-31
+
+- `npm.cmd test -- --run`: 130 passing tests across 12 files. Twelve new wall regressions exercise insertion, fixed neighboring points, separate/overlapping joints, independent rectangular loops, rotated/scaled edits, legacy compatibility, save/undo history, hollow-box collisions and rebound at an edited joint.
+- `npm.cmd run build`: passes type checking and production bundling. Existing large-bundle warning remains.
+- `node .qa/wall-editing-check.cjs`: passes against the restored `private-preview` preview using an isolated Chromium context. Mouse and emulated touch drags, live canvas updates, active-point highlight, detached box shaping, a three-point zigzag, outer boundary isolation, JSON and browser save/open, undo/redo, and exported ZIP playback all pass with no page errors. No edits were made to Matt's browser storage.
+- Rendered screenshots reviewed at desktop and 800-pixel tablet width: `docs/wall-editing-desktop.png`, `docs/wall-editing-tablet.png`; exported player: `docs/wall-editing-player.png`. Machine-readable result: `docs/wall-editing-check.json`. Physical-tablet verification remains outstanding for this repair.
+- Header, headboard, tool/color column layout and all unrelated parts retain the approved design. Existing arrow and hand control slots now describe Stretch and Move; the reference Box fills its original palette position.
+- Network verification: `example.test:8080` and restored `example.test:5173` respond with HTTP 200. Restarted the completed project's existing IPv4 preview on port 5173; no hostname, proxy, web server, firewall or authentication configuration changed. A separate old Phase 1 checkout listens on IPv6 loopback port 5173 and was left running.
+
+## Playfield proportion correction — 2026-10-27
+
+118 unit/physics tests pass and the production build passes. Added regression checks for both coordinate spaces, imports, paint bounds, walls, wider-table ball positions and drain height. Browser touch placement put all 42 reference choices at their requested coordinates. Tools, undo, save/open, JSON and playable ZIP export pass with no runtime errors.
+
+Actual rendered editor and player were compared with the supplied reference. Desktop (1280px), tablet-sized (800px) and narrow (390px) layouts preserve the 308:384 ratio without horizontal overflow. Exported-game checks cover both canvas dimensions and displayed aspect ratio, catching the previous CSS stretching. Legacy and reference projects round-trip unchanged; legacy projects retain their original canvas size.
+
+Reference pictures, artwork placement near the expanded right edge, and Fit artwork to playfield were exercised in the browser. The final green/black region comparison agrees on 99.81% of sampled pixels after the stated corner exclusion; this is not an overall visual-fidelity score. Sixty local background-render samples averaged 9.28 ms (p95 12.5 ms). Background rendering runs during edits/startup, not during each gameplay frame.
+
+Evidence: docs/proportions-comparison.png, docs/proportions-1280.png, docs/proportions-800.png, docs/proportions-390.png, docs/proportions-player.png and the proportions-check / proportions-tools-check / proportions-visual-check JSON reports. The comparison omits no board pixels visually; its numerical region check excludes the unidentified 32 × 24 top-left symbol and measures green/black membership rather than exact image equality.
+
+Physical-device touch input is still unverified. Unidentified controls remain unassigned, and pixel editing remains deferred. Minor edge differences and the absent unidentified corner symbol prevent a claim of exact reproduction.
+
+## Annotated parts and editor tools — 2026-10-27
+
+114 unit/physics tests pass; production build passes. Tests cover all three trap captures and replacement lives, rotated traps, multiball gates from opposite directions, black-hole drains, spinner motion, rebound flash, combo mission points, barrier splitting, edge shaping, connected paint, gravity and data validation.
+
+Browser checks at private-preview placed all 42 choices using touch input and verified undo/redo, identical editing data after Test, project import/export and an exported player opened from disk. Additional tool workflows verify scissors, edge dragging, hammer/undo, connected-wall paint, separate colors in enclosed surface regions, gravity persistence, toolbar Save/Open, and painted regions in the standalone player. No browser errors. A 60-sample local browser measurement of the painted background averaged 6.26 ms, with p95 8 ms; it is not redrawn during play. The split-point assertion allows browser coordinate rounding; production coordinates are not rounded by the cutter.
+
+Header, headboard and color-control markup match the earlier approved checkpoint. The new annotation explicitly authorizes the tool function/icon changes; column CSS is unchanged. Actual desktop and 800px tablet-layout screenshots were inspected: docs/annotated-reference-editor.png, docs/annotated-reference-parts.png, docs/annotated-reference-player.png, docs/annotated-tools-editor.png and docs/annotated-tools-tablet.png. Reports: docs/annotated-reference-check.json and docs/annotated-tools-check.json.
+
+Remaining limitations: no physical tablet/device test; unknown square and two toolbar symbols unassigned; pixel editor deferred; board proportions still narrower than the reference. These results do not claim a complete visual reproduction.
+
+## Reference pieces and confirmed mechanics — 2026-10-27
+
+93 tests and production build pass. New physics checks cover upward-only spring contact, both horizontal spring faces, a served ball resting on the plunger until launch, and all nine bottom rollovers awarding once per crossing without bouncing.
+
+Fresh Chromium with touch enabled at 1280 × 900 placed all 33 choices, undid/redid placement, preserved identical project data through playtesting and import/export, and played the exported ZIP from disk. No browser errors. Header, right tools and headboard markup match the approved Git checkpoint. Actual rendered editor and player were inspected. Evidence: docs/reference-check.json, docs/reference-editor.png, docs/reference-parts.png, docs/reference-player.png.
+
+Remaining gaps: unidentified reference controls/parts, narrower playfield proportions, and physical tablet access. The screenshot is the pixel-reference pass, not a claim of full fidelity to the glossy rendition.
+
+
+## Palette cleanup — 2026-10-27
+
+88 tests and production build pass. A fresh Chromium touch context placed all 19 visible choices, verified undo/redo, and exported identical project data before and after playtesting. No browser errors. Checked header, right tools, and headboard markup against the prior Git checkpoint: unchanged. Rendered evidence: docs/cleanup-editor.png; report: docs/cleanup-check.json. Physical tablet access and complete screenshot fidelity remain unverified.
+
+## Tablet parts-box follow-up — 2026-10-26
+
+The added eight presets are validated at an interior placement point; short and angled wall endpoints are checked relative to the drop location. Desktop Chrome at an 800 × 1000 tablet-sized viewport placed a cyan bumper by dragging and a short wall by tapping its icon then tapping the table. A dedicated touch-event path with visible drag preview and table drop highlight was added after the user reported finger dragging failed. **Physical finger dragging on the user's tablet still needs user verification.**
+
 ## Modern picture and scale pass — 2026-10-26
 
 `npm.cmd test`: **86 tests passed** in nine files. `npm.cmd run build`: TypeScript and Vite passed. New checks validate two independent picture references and fit modes, reject broken references, verify their exact bytes in the ZIP, and verify the polished component atlas in standalone output. `scripts/modern-qa.mjs` generated an independent **9-file, 7,864,492-byte** ZIP with **28 parts and two uploaded picture assets**; its CRC/inventory check passed.

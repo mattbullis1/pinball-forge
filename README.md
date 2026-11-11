@@ -1,5 +1,13 @@
 # PINBALL FORGE
 
+**Alpha v0.7.0-alpha.1** — [open the live construction set](https://pinball.mattbullis.com/).
+
+Build a table, choose **Test**, then use the left/right mouse buttons or Shift keys for the flippers and Space to launch. Touch controls are included. **Save** stores a project in this browser; **Project ↓** downloads an editable backup; **DOWNLOAD MY PINBALL GAME** creates a standalone playable ZIP.
+
+This is an early release. Keep a project-file backup while experimenting. Browser saves belong to the device and website address where they were created; opening the public site does not transfer a table saved on development machine. Import the downloaded project file to move it.
+
+Latest fixes include independent wall points, Stretch insertion, editable Box walls, the three-ball catcher drop, and pinball sounds. See [alpha release notes](docs/ALPHA-RELEASE.md) and [asset/license information](LICENSES.md).
+
 ## Modern picture layout
 
 The editor shows the headboard picture to the **left** of the playfield, leaving a wider five-column parts box on the right. The whole playfield scales to the available screen height. In Test and in the standalone game, the headboard is **right** of the playfield. The header/menu, far-right color tools, and pop-in menus retain their established layout.
@@ -14,7 +22,7 @@ A browser construction set inspired by Bill Budge's Apple II workbench: table on
 
 From this directory run `npm.cmd install`, then `npm.cmd run dev`. The preview is served at `private-preview` while Vite is running. The explicit alternative is `node node_modules/vite/bin/vite.js --host 0.0.0.0 --port 5173 --strictPort`.
 
-`npm.cmd run build` creates relative-path static files in `dist/`. `npm.cmd test` runs the construction and physics tests. web server configuration and existing sites remain unchanged. Extracted export examples are tested in a separate local QA folder under the existing webroot. Public publishing requires separate approval.
+`npm.cmd run build` creates relative-path static files in `dist/`. `npm.cmd test` runs the construction and physics tests. web server configuration and existing sites remain unchanged. Extracted export examples are tested in a separate local QA folder under the existing webroot. The current alpha is published at https://pinball.mattbullis.com/.
 
 ## Build a table
 
@@ -31,7 +39,7 @@ Shortcuts: H Hand; V Move corner; A Add corner; X Remove corner; P Paint. Ctrl/C
 
 ## Playtest
 
-**Test** replaces the parts box with the scoreboard. Left/Right Shift operate flippers; Space launches. Touch controls are provided. Scoring parts have default points, synthesized sound, and a brief hit flash. Test uses a cloned table, a fixed 120 Hz simulation, and shared renderer/physics geometry. **Back to Build** preserves editing data. Restart starts another three-ball game.
+**Test** replaces the parts box with the scoreboard. Hold the left/right mouse buttons over the playfield, or Left/Right Shift, to operate the corresponding flippers; Space launches. Touch controls are provided. Bumpers make a solenoid thump and metallic ring; lights chime when crossed. Scoring parts retain their configured points. Test uses a cloned table, a fixed 120 Hz simulation, and shared renderer/physics geometry. **Back to Build** preserves editing data. Restart starts another three-ball game. After the third capture, the three-ball catcher releases the balls below it to fall under gravity.
 
 Phase 3 uses motion-driven flipper contacts, fixed simulation substeps, outward bumper/slingshot impulses, and contact-based scoring. Each fresh ball launches once; pressing Space during play does not kick it again. Pause/Resume preserves the ball; switching away from the window or hiding the page pauses automatically. Restart clears the score and restores three balls. Touch flipper buttons support independent held inputs. Placing a ball relocates the single starting ball; optional multiball gates add two active balls during a turn.
 

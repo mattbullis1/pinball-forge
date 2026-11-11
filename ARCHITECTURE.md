@@ -3,13 +3,13 @@
 ## Modern picture and component pass
 
 - `pictures.ts` binds two independent local picture slots to asset IDs in the table model. It uses the existing raster importer, history snapshots, project storage, and ZIP asset path. The table picture is clipped to the editable perimeter. Images are visual layers only and do not alter collisions.
-- `pictures.css` lays out the editor with the headboard at left and five palette columns on wide screens. The player keeps its sign and scoreboard on the right. The locked top navigation, color/tool strip, and property drawers are untouched.
+- `pictures.css` lays out the editor with the headboard at left and reference-positioned component buttons. The player keeps its sign and scoreboard on the right. The locked top navigation, color/tool strip, and property drawers are untouched.
 - `modern-parts.ts` draws original raster sprites for flippers, ball, bumpers, slingshots, target, and light. `polished.ts` draws metallic walls, adjustable solid shapes, drain, and launcher. Geometry and Matter.js bodies remain shared with Classic.
 - `src/assets/modern-parts.png` is the authored source atlas, `public/modern-parts.png` serves the static editor, and `export-game.ts` includes the same bytes in each polished standalone ZIP. The exported runtime resolves its atlas and both user pictures by relative paths, without an editor or CDN.
 - `scripts/modern-qa.mjs` makes a self-contained sample and independent ZIP for local HTTP verification. Its web server QA output is separate from existing sites and does not require server configuration changes.
 
 - `main.ts` loads `editor.ts`, which manages DOM controls, pointer interaction, painting, play/edit transitions, and persistence.
-- `model.ts` defines serializable components, 20 working palette presets, three sample tables, and import validation. Valid older segment-based tables remain readable; exterior color is optional for compatibility.
+- `model.ts` defines serializable components, 28 working palette presets, three sample tables, and import validation. Valid older segment-based tables remain readable; exterior color is optional for compatibility.
 - `geometry.ts` supplies transforms, mirrored shapes, hit detection, connected-boundary operations, validity checks, and triangle decomposition. Rendering and Matter bodies use the same polygon points.
 - `draw.ts` draws original procedural components through a half-resolution buffer for vintage edges. Palette thumbnails use the same functions.
 - `history.ts` stores up to 80 independent snapshots. A pointer gesture records only its completed transaction; cancellation restores its starting snapshot.
@@ -67,3 +67,17 @@ Browser file saves, IndexedDB and undo snapshots serialize the complete optional
 
 
 Powered rubber contacts use a small, fixed-seed pseudo-random sequence to rotate just the added impulse by at most two degrees. The generator advances only when the collision needs a kick, never on display frames, and resets on Restart. This breaks perfectly repeated powered bounces while retaining repeatable simulations and the existing speed cap.
+
+Reference parts use the user-provided GIF in `reference-parts.ts`: cached transparent sprites, shared collision outlines, and inline export assets. New saved parts carry an optional validated sprite ID; legacy parts retain their previous rendering and dimensions. Confirmed spring actions live in the existing physics contact loop, and rollover lights reuse its sensor/scoring path.
+
+The annotated trap keeps counts in simulation state, separate from the editable table. Its first two captures serve replacement balls without consuming lives; the third releases three active balls. One-way gate permissions are set per collision pair so simultaneous balls can approach from opposite directions. Reference spinner animation projects its height rather than rotating its collision body. Rebound walls use a short light flash.
+
+Arrow edge edits, barrier cuts and connected-wall paint reuse `geometry.ts` and the existing history/validation path. Optional `Table.gravity` defaults to the previous 1.1. `surface-paint.ts` floods the connected area between walls on the existing two-pixel grid, records color seeds and redraws them from current geometry. The background is computed on editor changes or player startup, not on every simulation frame. These optional fields use the same project validation/export path as existing table data. No pixel-editing tool or guessed unknown controls were added.
+
+Optional `Table.playfield: 'reference'` selects 616 × 768 through `tableSize()`, preserving the reference's aspect ratio and two world units per component-source pixel. Its absence retains legacy 560 × 840 coordinates. Canvas dimensions, pointer input, physics bounds, image clipping, artwork sizing and CSS ratios derive from this shared size. New reference outlines use a four-world-unit raster for the original stepped border; no per-frame physics rendering cost is added. Saved tables are not migrated automatically.
+
+## Wall points and independent boxes (2026-10-31)
+
+The existing `wall` endpoint representation and `obstacle.points` polygon representation remain. Stretch uses `addCorner` to project a new point onto an edge and returns the new handle. Interior split segments optionally retain `wallGroup` and `wallNodes` identifiers; dragging updates only endpoints attached to that node, even when separate points overlap. Boundary walls retain their existing shared-endpoint behavior. Tables without these optional fields load unchanged.
+
+Box reuses an obstacle polygon with `wallLoop: true`, initially four points. Rendering strokes its closed outline; Matter builds static edge bodies and corner caps instead of filling its interior. Both use the same transformed `shape` vertices. Brush masks treat loops as boundaries. Existing snapshots persist insertion and movement separately; normal project saves and ZIP export carry these optional fields. No new editor, server package, dependency or tool column was introduced.

@@ -1,0 +1,13 @@
+{
+  "url": "private-preview",
+  "cut": true,
+  "shape": true,
+  "connectedPaint": true,
+  "enclosedAreaPaint": true,
+  "hammerUndo": true,
+  "gravityRoundTrip": true,
+  "toolbarSave": true,
+  "exportedPlayerPaint": true,
+  "touch": true,
+  "errors": []
+}

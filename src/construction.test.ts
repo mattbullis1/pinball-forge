@@ -1,9 +1,26 @@
 import {describe,it,expect} from 'vitest';
-import {fromPreset,makePart,newTable,sampleTables,validateTable} from './model';
+import {emptyWorkbench,fromPreset,makePart,newTable,sampleTables,tableSize,validateTable} from './model';
 import {addCorner,end,moveVertex,perimeter,removeCorner,same,shape,simplePolygon,translate,triangles,validGeometry,vertices} from './geometry';
 import {History} from './history';
 import {createGame} from './physics';
 describe('construction workflow',()=>{
+ it('round-trips reference dimensions while keeping older projects in their original coordinate space',()=>{
+  const reference=JSON.parse(JSON.stringify(emptyWorkbench())),legacy=JSON.parse(JSON.stringify(newTable()));
+  expect(validateTable(reference)).toBe(true);expect(validateTable(legacy)).toBe(true);
+  expect(tableSize(reference).width/tableSize(reference).height).toBe(308/384);expect(tableSize(legacy)).toEqual({width:560,height:840});
+  reference.parts=[makePart('ball',600,700)];legacy.parts=[makePart('ball',600,700)];
+  expect(validateTable(reference)).toBe(true);expect(validateTable(legacy)).toBe(false);
+  reference.parts=[makePart('ball',280,800)];legacy.parts=[makePart('ball',280,800)];
+  expect(validateTable(reference)).toBe(false);expect(validateTable(legacy)).toBe(true);
+  expect(validateTable({...reference,playfield:'unknown'})).toBe(false);
+ });
+ it('validates wall edits and surface colors against the current playfield bounds',()=>{
+  const t=emptyWorkbench();t.parts=[{...makePart('wall',580,600),x2:610,y2:700}];t.surfacePaint=[{x:600,y:740,color:'#123456'}];
+  expect(validateTable(t)).toBe(true);translate(t,t.parts[0].id,10,0);expect(validateTable(t)).toBe(false);
+  t.parts=[];t.surfacePaint[0].y=800;expect(validateTable(t)).toBe(false);
+ });
+ it('starts with a valid empty green and black workbench',()=>{const t=emptyWorkbench();expect(validateTable(t)).toBe(true);expect(t.surface).toBe('#000000');expect(t.parts.every(p=>p.boundary&&p.kind==='wall')).toBe(true)});
+ it('positions reference guide rails relative to the drop point',()=>{const ids=['wall','shortWall','angledWall','reverseWall'];for(const id of ids){const t=newTable(),p=fromPreset(id,220,320);t.parts.push(p);expect(validateTable(t),id).toBe(true)}expect(end(fromPreset('shortWall',220,320))).toEqual({x:220,y:368});expect(end(fromPreset('angledWall',220,320))).toEqual({x:356,y:352})});
  it('moves both sides of a shared boundary corner and preserves the drain gap',()=>{const t=newTable(),p=t.parts[0];moveVertex(t,{id:p.id,index:0,point:p},{x:90,y:55});expect(t.parts[0].x).toBe(90);expect(end(t.parts.filter(p=>p.boundary).at(-1)!)).toEqual({x:90,y:55});expect(validGeometry(t)).toBe(true);const walls=t.parts.filter(p=>p.boundary);expect(walls.filter((p,i)=>!same(end(p),walls[(i+1)%walls.length]))).toHaveLength(1)});
  it('adds, moves and removes a boundary corner without disconnecting neighbors',()=>{const t=newTable(),p=t.parts[0],before=perimeter(t);addCorner(t,p.id,{x:250,y:22},'new-corner');expect(perimeter(t)).toHaveLength(before.length+1);expect(validGeometry(t)).toBe(true);moveVertex(t,{id:p.id,index:1,point:end(p)},{x:250,y:60});expect(validGeometry(t)).toBe(true);expect(removeCorner(t,{id:p.id,index:1,point:end(p)})).toBe(true);expect(perimeter(t)).toEqual(before)});
  it('protects the open drain endpoint',()=>{const t=newTable(),p=t.parts.find(p=>p.boundary&&p.x2===340)!;expect(removeCorner(t,{id:p.id,index:1,point:end(p)})).toBe(false);expect(validGeometry(t)).toBe(true)});
@@ -15,6 +32,14 @@ describe('construction workflow',()=>{
  it('decomposes the concave sample obstacle without losing its area',()=>{const p=sampleTables()[0].parts.find(p=>p.kind==='obstacle')!,v=shape(p);const area=(points:typeof v)=>Math.abs(points.reduce((a,p,i)=>a+p.x*points[(i+1)%points.length].y-points[(i+1)%points.length].x*p.y,0)/2);expect(triangles(v).reduce((a,t)=>a+area(t),0)).toBeCloseTo(area(v))});
 });
 describe('shared playtest geometry',()=>{
+ it('uses each table bottom for draining and retains the legacy drain height',()=>{
+  const remaining=[emptyWorkbench(),newTable()].map(t=>{t.parts=[makePart('ball',280,760)];const g=createGame(t,()=>{});for(let i=0;i<35;i++)g.step(1000/120);const count=g.balls();g.stop();return count});
+  expect(remaining).toEqual([2,3]);
+ });
+ it('keeps a ball within the wider reference table alive',()=>{
+  const t=emptyWorkbench();t.gravity=0;t.parts=[makePart('ball',600,500)];expect(validateTable(t)).toBe(true);
+  const g=createGame(t,()=>{});for(let i=0;i<120;i++)g.step(1000/120);expect(g.balls()).toBe(3);expect(g.ball()!.x).toBeCloseTo(600);g.stop();
+ });
  it('launches each sample ball out of the shooter lane into the playfield',()=>{for(const t of sampleTables()){const g=createGame(t,()=>{});g.launch();let enters=false;for(let i=0;i<600;i++){g.step(1000/120);const p=g.ball();if(p&&p.x<475&&p.y<300)enters=true}expect(enters,t.title).toBe(true);g.stop()}});
  it('collides with a painted solid obstacle using its visible coordinates',()=>{const t=newTable();t.parts=[makePart('ball',280,100),{...makePart('obstacle',280,300),color:'#ff8426'}];const copy=structuredClone(t),g=createGame(t,()=>{});let lowest=0;for(let i=0;i<180;i++){g.step(1000/120);lowest=Math.max(lowest,g.ball()!.y)}expect(lowest).toBeLessThan(265);expect(lowest).toBeGreaterThan(240);expect(t).toEqual(copy);g.stop()});
  it('uses edited wall endpoints for collisions',()=>{const t=newTable();t.parts=[makePart('ball',280,100),{...makePart('wall',180,400),x2:380,y2:400}];moveVertex(t,{id:t.parts[1].id,index:0,point:t.parts[1]},{x:180,y:300});moveVertex(t,{id:t.parts[1].id,index:1,point:end(t.parts[1])},{x:380,y:300});const g=createGame(t,()=>{});let lowest=0;for(let i=0;i<180;i++){g.step(1000/120);lowest=Math.max(lowest,g.ball()!.y)}expect(lowest).toBeLessThan(300);expect(lowest).toBeGreaterThan(280);g.stop()});

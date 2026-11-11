@@ -1,0 +1,33 @@
+{
+  "visibleParts": [
+    "Left flipper",
+    "Right flipper",
+    "Small left flipper",
+    "Small right flipper",
+    "Pinball",
+    "Wall guide",
+    "Short wall",
+    "Angled wall",
+    "Bumper",
+    "Small bumper",
+    "Left slingshot",
+    "Right slingshot",
+    "Target",
+    "Side target",
+    "Launcher",
+    "Drain",
+    "Rollover",
+    "Green light",
+    "Magnet"
+  ],
+  "placed": 19,
+  "undoRedo": true,
+  "projectRoundTrip": true,
+  "playtestPreservedProject": true,
+  "lockedSectionsUnchanged": [
+    "header",
+    "headboard",
+    "tools"
+  ],
+  "browserErrors": []
+}

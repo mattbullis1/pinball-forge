@@ -1,32 +1,19 @@
-# Licenses
+# Licenses and assets
 
-## Modern graphics pass
+PINBALL FORGE application code is original project work under the MIT license in `LICENSE`.
 
-The new nebula table image, PINBALL FORGE headboard image, and transparent chrome component atlas were generated specifically for this project. They are included as editable examples and project artwork, with no downloaded commercial sprite sheets or historical game images. The screenshots supplied by the user were visual references and are not bundled into exported games. The generated project artwork is distributed with this repository under its MIT license. User-uploaded pictures remain subject to their owners' rights; exporting a game packages their exact image bytes.
+## Current artwork
 
-PINBALL FORGE application code is original work in this repository and is licensed under the MIT license in `LICENSE`.
+- The classic component atlas in `src/assets/construction-reference.gif` comes from the user-supplied Pinball Construction Set reference. It is embedded in classic rendering, including exported games. This third-party reference artwork is **not** covered by this repository's MIT license; its original rights remain with its respective owner. No license to that artwork is granted by this project.
+- The polished chrome atlas, nebula table and headboard examples were generated for this project. Original generated/procedural project artwork is distributed under the repository's MIT license.
+- User-imported pictures and audio retain their original ownership and licenses. Exporting packages their bytes; it does not grant redistribution rights.
+- Default pinball sounds are synthesized locally. No proprietary sound recordings or game ROMs are included.
 
-- Matter.js: MIT license. The dependency's license text is in `node_modules/matter-js/LICENSE` after installation.
-- Vite, TypeScript, Vitest, and other development dependencies: see their package license files and package metadata.
-- Current component art is drawn procedurally by this project. No historical Pinball Construction Set images are bundled.
+The earlier phase notes described procedural art only. The current classic renderer does include the reference image above. `public/ASSET-NOTICE.txt` accompanies the live build and is included in editor and standalone-player notices.
 
-Standalone exports include application and Matter.js MIT license notices.
+## Dependencies
 
-This revision uses original procedural pixel-style drawings and locally synthesized Web Audio tones. No historical code, ROMs, video frames, or proprietary sound effects are bundled. Design reference links are research sources. The standalone export includes its applicable runtime license notices.
-
-## Phase 2 artwork
-
-The metallic/light materials, spacecraft, energy field, warning beacon, Star Workshop table, and small test fixtures are original procedural work under the repository MIT license. No historical screenshots, commercial pinball artwork, or downloaded stock assets are bundled. No new runtime or development dependencies were added for Phase 2. User-imported files retain their own licensing; importing them does not grant redistribution rights. Native browser image playback and IndexedDB require no paid APIs or services.
-
-## Phase 3 runtime
-
-Physics continues to use the existing MIT-licensed Matter.js dependency. The control, lifecycle, fixed-step integration, test fixtures and measurement script are original project code under this repository's MIT license. No additional dependencies or third-party assets were introduced.
-
-## Phase 4 packaging
-
-JSZip 3.10.2 is dual-licensed MIT or GPLv3; this project selects MIT. It runs in the editor to create ZIP files and is not included in the standalone player. The editor production build emits LICENSES.txt with application, Matter.js, JSZip and its installed dependency-tree notices, including pako. The game runtime includes only application code and Matter.js notices. No additional third-party graphics or sounds were added.
-
-
-## Phase 5 workshop
-
-All new symbols, rules/runtime code, fixtures and the two synthesized Workshop WAV files are original project work under the repository MIT license. No new packages, paid APIs, stock assets or historical game sounds were added. User-imported audio retains its original license; its author must supply any required notices when distributing exported games.
+- Matter.js: MIT. Its license is included with the editor and standalone runtime.
+- JSZip 3.10.2: dual MIT/GPLv3; this project selects MIT. Used by the editor for ZIP export.
+- The editor's `LICENSES.txt` contains the installed runtime dependency-tree notices, including pako.
+- Vite, TypeScript, Vitest and other development dependencies retain their package licenses.

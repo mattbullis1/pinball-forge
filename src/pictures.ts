@@ -1,10 +1,11 @@
 import {readArtwork} from './artwork';
 import {perimeter} from './geometry';
-import {Table,W,H} from './model';
+import {Table,tableSize} from './model';
 
 export type PictureSlot='table'|'headboard';
 
 export function syncPicture(image:HTMLImageElement,table:Table,slot:PictureSlot){
+ const {width:W,height:H}=tableSize(table);
  const picture=table.pictures?.[slot],asset=picture&&table.assets?.[picture.assetId];
  image.hidden=!asset;
  if(asset){if(image.getAttribute('src')!==asset.data)image.src=asset.data;image.style.objectFit=picture!.fit}
@@ -35,10 +36,10 @@ export function pictureControls(h:Hooks){
    const project=h.table().id;
    try{const asset=await readArtwork(file);
     if(project!==h.table().id||h.busy()){h.message('The table changed during import. Choose the picture again.');return}
-    if(h.commit(t=>{t.assets??={};t.assets[asset.id]=asset;t.pictures??={};t.pictures[slot]={assetId:asset.id,fit:'cover'}}))h.message(`${slot==='table'?'Table':'Headboard'} picture added. It will be saved and included in your game ZIP.`);
+    if(h.commit(t=>{t.assets??={};t.assets[asset.id]=asset;t.pictures??={};t.pictures[slot]={assetId:asset.id,fit:'cover'}}))h.message(`${slot==='table'?'Playfield background':'Headboard'} picture added. It will be saved and included in your game ZIP.`);
    }catch(error){h.message(error instanceof Error?error.message:String(error))}
   });
-  remove.addEventListener('click',()=>{if(h.busy())return;h.commit(t=>{if(t.pictures)delete t.pictures[slot]});h.message(`${slot==='table'?'Table':'Headboard'} picture removed.`)});
+  remove.addEventListener('click',()=>{if(h.busy())return;h.commit(t=>{if(t.pictures)delete t.pictures[slot]});h.message(`${slot==='table'?'Playfield background':'Headboard'} picture removed.`)});
   fit.addEventListener('change',()=>{const value=fit.value;if(value!=='cover'&&value!=='contain')return;h.commit(t=>{if(t.pictures?.[slot])t.pictures[slot].fit=value})});
  }
  sync();return {sync};

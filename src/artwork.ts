@@ -1,5 +1,5 @@
 import {Asset,frameAt,frameLayout,imageTypes} from './art-model';
-import {Table,Part,W,H,uid} from './model';
+import {Table,Part,tableSize,uid} from './model';
 import {perimeter} from './geometry';
 
 export async function readArtwork(file:File):Promise<Asset>{
@@ -20,6 +20,7 @@ export class ArtworkLayers{
  private parts:Part[]=[];private assets:Record<string,Asset>={};private started=performance.now();private raf=0;private flashing?:string;
  constructor(private back:HTMLElement,private front:HTMLElement){}
  sync(t:Table,selected?:string,testing=false,flash?:string){
+  const {width:W,height:H}=tableSize(t);
   this.assets=t.assets??{};this.parts=t.parts.filter(p=>p.kind==='artwork'&&p.art);
   const ids=new Set(this.parts.map(p=>p.id));for(const [id,n] of this.nodes)if(!ids.has(id)){n.box.remove();this.nodes.delete(id)}
   const outline=perimeter(t),clip=outline.length?`polygon(${outline.map(v=>`${v.x/W*100}% ${v.y/H*100}%`).join(',')})`:'';
@@ -40,15 +41,4 @@ export class ArtworkLayers{
  }
  flash(id?:string){if(id===this.flashing)return;if(this.flashing)this.nodes.get(this.flashing)?.box.classList.remove('art-hit');if(id)this.nodes.get(id)?.box.classList.add('art-hit');this.flashing=id}
  private tick=(now:number)=>{if(!document.hidden)for(const p of this.parts){const n=this.nodes.get(p.id);if(n&&p.art?.animation&&frameAt(now-this.started,p.art.animation)!==n.frame)this.updateFrame(p,n,now-this.started)}this.raf=requestAnimationFrame(this.tick)};
-}
-
-export function builtInArtwork(kind:'beacon'|'energy'|'spacecraft'):Asset{
- const canvas=document.createElement('canvas');canvas.width=64*8;canvas.height=64;const c=canvas.getContext('2d')!;
- for(let i=0;i<8;i++){c.save();c.translate(i*64+32,32);const phase=i/8*Math.PI*2;
-  if(kind==='beacon'){c.fillStyle='#272838';c.fillRect(-22,18,44,9);c.shadowColor='#ff50dc';c.shadowBlur=8+8*Math.sin(phase);c.fillStyle=`hsl(320 100% ${55+20*Math.sin(phase)}%)`;c.beginPath();c.arc(0,9,20,Math.PI,0);c.lineTo(20,16);c.lineTo(-20,16);c.fill();c.fillStyle='#fff8';c.fillRect(-10,-5,5,12)}
-  else if(kind==='energy'){c.rotate(phase);c.strokeStyle='#42e7ef';c.lineWidth=3;c.shadowColor=c.strokeStyle;c.shadowBlur=6;for(let r=10;r<=26;r+=8){c.beginPath();c.ellipse(0,0,r,r*.6,phase,0,Math.PI*1.75);c.stroke()}c.fillStyle='#f4f4ef';c.fillRect(-3,-3,6,6)}
-  else{c.rotate(Math.sin(phase)*.14);c.fillStyle='#ff8426';c.beginPath();c.moveTo(-6,14);c.lineTo(0,24+5*Math.sin(phase));c.lineTo(6,14);c.fill();c.fillStyle='#bbc9dc';c.strokeStyle='#fff';c.lineWidth=2;c.beginPath();c.moveTo(0,-26);c.lineTo(10,3);c.lineTo(24,15);c.lineTo(7,12);c.lineTo(0,18);c.lineTo(-7,12);c.lineTo(-24,15);c.lineTo(-10,3);c.closePath();c.fill();c.stroke();c.fillStyle='#42e7ef';c.beginPath();c.ellipse(0,-7,4,9,0,0,7);c.fill()}
-  c.restore();
- }
- return{id:uid(),name:{beacon:'Warning beacon',energy:'Energy field',spacecraft:'Spacecraft'}[kind],mime:'image/png',data:canvas.toDataURL(),width:canvas.width,height:canvas.height};
 }

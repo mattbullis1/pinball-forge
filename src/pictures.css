@@ -16,8 +16,16 @@
 .headboard-readout span{display:flex;justify-content:space-between;gap:4px}
 .headboard-readout output{color:#ff8426}
 .table-picture-image{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;object-position:center}
+.palette-ghost{position:fixed;z-index:30;width:96px;height:80px;pointer-events:none;opacity:.82;filter:drop-shadow(0 5px 8px #000)}
+.palette-ghost.over-table{opacity:1;filter:drop-shadow(0 0 8px #42e7ef)}
+#canvas.drag-over{outline:3px solid #42e7ef;outline-offset:2px}
 .table-heading .picture-controls{justify-content:flex-end}
-@media(min-width:1101px){main{max-width:1700px;grid-template-columns:minmax(185px,280px) minmax(350px,560px) minmax(460px,1fr);gap:16px}.stage{width:100%}#parts{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px 1px}.part{height:clamp(48px,7dvh,68px)}.part canvas{max-width:86px}.headboard-preview{max-width:280px}}
-@media(min-width:601px) and (max-width:1100px){main{grid-template-columns:minmax(0,52%) minmax(0,48%)}.stage{grid-column:1;grid-row:1}.headboard-preview{grid-column:1;grid-row:2;padding-top:0;max-width:320px;margin:auto}.workbox{grid-column:2;grid-row:1/span 2}.picture-controls button,.picture-controls select{font-size:9px}}
+@media(min-width:1101px){main{max-width:1700px;grid-template-columns:minmax(185px,280px) minmax(350px,var(--playfield-width,560px)) minmax(460px,1fr);gap:16px}.stage{width:100%}#parts{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px 1px}.part{height:clamp(48px,7dvh,68px)}.part canvas{max-width:86px}.headboard-preview{max-width:280px}}
+@media(min-width:601px) and (max-width:1100px){main{grid-template-columns:minmax(0,52%) minmax(0,48%)}.stage{grid-column:1;grid-row:1}.headboard-preview{grid-column:1;grid-row:2;padding-top:0;max-width:320px;margin:auto}.workbox{grid-column:2;grid-row:1/span 2}#parts{grid-template-columns:repeat(5,minmax(0,1fr))}.part{height:clamp(50px,7dvh,70px)}.picture-controls button,.picture-controls select{font-size:9px}}
 @media(max-width:600px){.headboard-preview{order:2;width:min(100%,360px);padding-top:12px;margin:auto}.stage{order:1}.workbox{order:3}.headboard-frame{aspect-ratio:16/9}.table-heading{flex-wrap:wrap;gap:4px}.table-heading .picture-controls{width:100%;justify-content:center}.picture-controls button,.picture-controls select{font-size:10px}}
-@media(min-width:1101px){.canvas-wrap{width:min(100%,calc((100dvh - 172px)*.666667),560px)}}
+@media(min-width:1101px){.canvas-wrap{width:min(100%,calc((100dvh - 172px)*var(--playfield-ratio,.666667)),var(--playfield-width,560px))}}
+/* Keep the parts in the reference's arrangement without moving the locked tools. */
+#parts{position:relative;display:block;width:min(100%,250px);aspect-ratio:180/342;padding:0;margin:12px auto}
+#parts .part{position:absolute;min-height:0;padding:0}
+#parts .part canvas{width:100%;height:100%;max-width:none;object-fit:contain}
+#parts .part span{z-index:1;white-space:nowrap;bottom:-12px}

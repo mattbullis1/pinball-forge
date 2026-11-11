@@ -1,9 +1,13 @@
 import type {Part,Point,Table} from './model';
+import {tableSize} from './model';
+import {referenceOutline} from './reference-parts';
 export const same=(a:Point,b:Point)=>Math.hypot(a.x-b.x,a.y-b.y)<.01;
 export const end=(p:Part):Point=>({x:p.x2??p.x+100,y:p.y2??p.y});
 export function transform(p:Part,v:Point):Point {const a=p.rotation*Math.PI/180,s=p.scale??1,x=p.mirror?-v.x:v.x;return {x:p.x+s*(x*Math.cos(a)-v.y*Math.sin(a)),y:p.y+s*(x*Math.sin(a)+v.y*Math.cos(a))}}
 export function local(p:Part,v:Point):Point {const a=-p.rotation*Math.PI/180,s=p.scale??1,x=(v.x-p.x)/s,y=(v.y-p.y)/s;return {x:(p.mirror?-1:1)*(x*Math.cos(a)-y*Math.sin(a)),y:x*Math.sin(a)+y*Math.cos(a)}}
 export function shape(p:Part):Point[]{
+  if(p.wallLoop)return (p.points??[]).map(v=>transform(p,v));
+  const outline=p.sprite&&referenceOutline(p.sprite,p.r);if(outline)return outline.map(v=>transform(p,v));
   if(p.kind==='obstacle')return (p.points??[]).map(v=>transform(p,v));
   if(p.kind==='slingshot')return [{x:-22,y:-40},{x:24,y:40},{x:-22,y:22}].map(v=>transform(p,v));
   if(p.kind==='leftFlipper'||p.kind==='rightFlipper'){const d=p.kind==='leftFlipper'?1:-1;return [{x:-6,y:-10},{x:82*d,y:-4},{x:92*d,y:3},{x:0,y:11}].map(v=>transform(p,v))}
@@ -23,21 +27,69 @@ export function simplePolygon(v:Point[]):boolean{
 export function inside(point:Point,v:Point[]){let yes=false;for(let i=0,j=v.length-1;i<v.length;j=i++){const a=v[i],b=v[j];if(on(a,b,point))return true;if((a.y>point.y)!==(b.y>point.y)&&point.x<(b.x-a.x)*(point.y-a.y)/(b.y-a.y)+a.x)yes=!yes}return yes}
 export function project(v:Point,a:Point,b:Point){const dx=b.x-a.x,dy=b.y-a.y,d=dx*dx+dy*dy;const u=d?Math.max(0,Math.min(1,((v.x-a.x)*dx+(v.y-a.y)*dy)/d)):0;const point={x:a.x+dx*u,y:a.y+dy*u};return {point,distance:Math.hypot(v.x-point.x,v.y-point.y)}}
 export function validGeometry(t:Table){
-  const bounded=(v:Point)=>Number.isFinite(v.x)&&Number.isFinite(v.y)&&v.x>=0&&v.x<=560&&v.y>=0&&v.y<=840;
+  const {width,height}=tableSize(t);
+  const bounded=(v:Point)=>Number.isFinite(v.x)&&Number.isFinite(v.y)&&v.x>=0&&v.x<=width&&v.y>=0&&v.y<=height;
   for(const p of t.parts){if(!bounded(p))return false;if(p.kind==='wall'&&(!bounded(end(p))||Math.hypot(p.x-end(p).x,p.y-end(p).y)<3))return false;if(p.kind==='obstacle'){const v=shape(p);if(!v.every(bounded)||!simplePolygon(v))return false}}
   const border=t.parts.filter(p=>p.boundary);if(!border.length)return true;
   if(border.filter((p,i)=>!same(end(p),border[(i+1)%border.length])).length!==1)return false;
   return simplePolygon(perimeter(t));
 }
 export type Vertex={id:string;index:number;point:Point};
-export function vertices(t:Table,id?:string):Vertex[]{return t.parts.filter(p=>p.id===id||(t.parts.find(q=>q.id===id)?.boundary&&p.boundary)).flatMap(p=>p.kind==='wall'?[{id:p.id,index:0,point:{x:p.x,y:p.y}},{id:p.id,index:1,point:end(p)}]:p.kind==='obstacle'?shape(p).map((point,index)=>({id:p.id,index,point})):[])}
-export function moveVertex(t:Table,v:Vertex,to:Point){const p=t.parts.find(p=>p.id===v.id)!;if(p.kind==='obstacle'){p.points![v.index]=local(p,to);return}const old=v.index===0?{x:p.x,y:p.y}:end(p);for(const q of t.parts){if(q.id!==p.id&&!(p.boundary&&q.boundary))continue;if(same(q,old)){q.x=to.x;q.y=to.y}if(q.kind==='wall'&&same(end(q),old)){q.x2=to.x;q.y2=to.y}}}
+function connected(a:Part,b:Part){return a.id===b.id||!!(a.boundary&&b.boundary)||!!(a.wallGroup&&a.wallGroup===b.wallGroup&&!a.boundary&&!b.boundary)}
+export function vertices(t:Table,id?:string):Vertex[]{const selected=t.parts.find(p=>p.id===id);return t.parts.filter(p=>!selected||connected(selected,p)).flatMap(p=>p.kind==='wall'?[{id:p.id,index:0,point:{x:p.x,y:p.y}},{id:p.id,index:1,point:end(p)}]:p.kind==='obstacle'?shape(p).map((point,index)=>({id:p.id,index,point})):[])}
+export function moveVertex(t:Table,v:Vertex,to:Point){
+ const p=t.parts.find(p=>p.id===v.id);if(!p)return;
+ if(p.kind==='obstacle'){p.points![v.index]=local(p,to);return}
+ const old=v.index===0?{x:p.x,y:p.y}:end(p);
+ // Resolve all attachments BEFORE changing any coordinates. Only this joint moves.
+ const node=p.wallNodes?.[v.index];
+ const attached=t.parts.filter(q=>q.kind==='wall'&&connected(p,q)).map(q=>({q,start:node?q.wallNodes?.[0]===node:same(q,old),finish:node?q.wallNodes?.[1]===node:same(end(q),old)}));
+ for(const {q,start,finish} of attached){if(start){q.x=to.x;q.y=to.y}if(finish){q.x2=to.x;q.y2=to.y}}
+}
 export function translate(t:Table,id:string,dx:number,dy:number){const p=t.parts.find(p=>p.id===id)!;if(p.kind==='wall'){const a={x:p.x,y:p.y},b=end(p);moveVertex(t,{id,index:0,point:a},{x:a.x+dx,y:a.y+dy});moveVertex(t,{id,index:1,point:b},{x:b.x+dx,y:b.y+dy})}else{p.x+=dx;p.y+=dy}}
-export function addCorner(t:Table,id:string,point:Point,newId:string){const p=t.parts.find(p=>p.id===id)!;if(p.kind==='wall'){const q={...p,id:newId,x:point.x,y:point.y};p.x2=point.x;p.y2=point.y;t.parts.splice(t.parts.indexOf(p)+1,0,q)}else if(p.kind==='obstacle'){const v=shape(p);const edges=v.map((a,i)=>({i,...project(point,a,v[(i+1)%v.length])})).sort((a,b)=>a.distance-b.distance);p.points!.splice(edges[0].i+1,0,local(p,edges[0].point))}}
+export function addCorner(t:Table,id:string,point:Point,newId:string,link=true):Vertex|undefined{
+ const p=t.parts.find(p=>p.id===id);if(!p||!['wall','obstacle'].includes(p.kind))return;
+ const v=p.kind==='wall'?[p,end(p)]:shape(p);
+ const edge=v.slice(0,p.kind==='wall'?1:v.length).map((a,i)=>({i,...project(point,a,v[(i+1)%v.length])})).sort((a,b)=>a.distance-b.distance)[0];
+ const at=edge.point;if([v[edge.i],v[(edge.i+1)%v.length]].some(a=>Math.hypot(a.x-at.x,a.y-at.y)<3))return;
+ if(p.kind==='wall'){
+  if(link&&!p.boundary)p.wallGroup??=p.id;
+  const q={...p,id:newId,x:at.x,y:at.y};
+  if(p.wallGroup){const [start,finish]=p.wallNodes??[p.id+':start',p.id+':end'];p.wallNodes=[start,newId];q.wallNodes=[newId,finish]}
+  p.x2=at.x;p.y2=at.y;t.parts.splice(t.parts.indexOf(p)+1,0,q);
+  return{id:p.id,index:1,point:at};
+ }
+ if(p.points!.length>=64)return;
+ p.points!.splice(edge.i+1,0,local(p,at));return{id:p.id,index:edge.i+1,point:at};
+}
+// Cut at the actual contact point; each resulting wall remains independently editable.
+export function splitBarrier(t:Table,id:string,point:Point,newId:string):boolean{
+ const p=t.parts.find(p=>p.id===id);if(!p||p.kind!=='wall')return false;
+ const at=project(point,p,end(p)).point;
+ if(Math.hypot(at.x-p.x,at.y-p.y)<3||Math.hypot(at.x-end(p).x,at.y-end(p).y)<3)return false;
+ return !!addCorner(t,id,at,newId,false);
+}
+export function moveEdge(t:Table,id:string,index:number,dx:number,dy:number){
+ const p=t.parts.find(p=>p.id===id)!;
+ if(p.kind==='wall'){translate(t,id,dx,dy);return}
+ if(p.kind!=='obstacle')return;
+ const v=shape(p);for(const i of [index,(index+1)%v.length])moveVertex(t,{id,index:i,point:v[i]},{x:v[i].x+dx,y:v[i].y+dy});
+}
+export function paintConnected(t:Table,id:string,color:string){
+ const first=t.parts.find(p=>p.id===id);if(!first)return;
+ const old=first.color,painted=new Set<string>(),pending=[first];
+ while(pending.length){
+  const p=pending.pop()!;if(painted.has(p.id))continue;painted.add(p.id);p.color=color;
+  if(p.kind==='wall')for(const q of t.parts){
+   if(q.kind==='wall'&&!!q.boundary===!!p.boundary&&q.color===old&&!painted.has(q.id)&&[p,end(p)].some(a=>[q,end(q)].some(b=>same(a,b))))pending.push(q);
+  }
+ }
+ if(first.boundary){t.exterior=color;t.parts.filter(p=>p.boundary).forEach(p=>p.color=color)}
+}
 export function removeCorner(t:Table,v:Vertex):boolean{const p=t.parts.find(p=>p.id===v.id)!;if(p.kind==='obstacle'){if(p.points!.length<=3)return false;p.points!.splice(v.index,1);return true}
   const point=v.index===0?{x:p.x,y:p.y}:end(p);const incoming=t.parts.find(q=>q.kind==='wall'&&!!q.boundary===!!p.boundary&&same(end(q),point));const outgoing=t.parts.find(q=>q.kind==='wall'&&!!q.boundary===!!p.boundary&&same(q,point));
   if(!incoming||!outgoing||incoming.id===outgoing.id)return false;
-  incoming.x2=outgoing.x2;incoming.y2=outgoing.y2;t.parts.splice(t.parts.indexOf(outgoing),1);return true;
+  incoming.x2=outgoing.x2;incoming.y2=outgoing.y2;if(incoming.wallNodes&&outgoing.wallNodes)incoming.wallNodes=[incoming.wallNodes[0],outgoing.wallNodes[1]];t.parts.splice(t.parts.indexOf(outgoing),1);return true;
 }
 export function triangles(points:Point[]):Point[][]{let v=points.map(p=>({...p}));if(v.reduce((a,p,i)=>a+p.x*v[(i+1)%v.length].y-v[(i+1)%v.length].x*p.y,0)<0)v.reverse();const out:Point[][]=[];let guard=0;
   while(v.length>3&&guard++<200){let found=false;for(let i=0;i<v.length;i++){const a=v[(i+v.length-1)%v.length],b=v[i],c=v[(i+1)%v.length];if(cross(a,b,c)<=.001)continue;if(v.some(p=>p!==a&&p!==b&&p!==c&&inside(p,[a,b,c])))continue;out.push([a,b,c]);v.splice(i,1);found=true;break}if(!found)break}if(v.length===3)out.push(v);return out;

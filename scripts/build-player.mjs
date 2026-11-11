@@ -10,11 +10,11 @@ export async function buildPlayer(){
  const css=output.find(o=>o.type==='asset'&&o.fileName.endsWith('.css'));
  if(!chunk||!css||chunk.imports.length||chunk.dynamicImports.length||output.length!==2)throw Error('Player build must contain one self-contained script and one stylesheet.');
  return {javascript:chunk.code,stylesheet:String(css.source),notices:
-  'PINBALL FORGE\n\n'+await readFile(root+'LICENSE','utf8')+'\n\nMatter.js\n\n'+await readFile(root+'node_modules/matter-js/LICENSE','utf8')};
+  'PINBALL FORGE\n\n'+await readFile(root+'LICENSE','utf8')+'\n\n'+await readFile(root+'public/ASSET-NOTICE.txt','utf8')+'\n\nMatter.js\n\n'+await readFile(root+'node_modules/matter-js/LICENSE','utf8')};
 }
 // Include the installed editor dependency tree's notices in its static build.
 export async function editorNotices(){
- const sections=['PINBALL FORGE\n\n'+await readFile(root+'LICENSE','utf8')],seen=new Set();
+ const sections=['PINBALL FORGE\n\n'+await readFile(root+'LICENSE','utf8'),await readFile(root+'public/ASSET-NOTICE.txt','utf8')],seen=new Set();
  async function collect(name){if(seen.has(name))return;seen.add(name);const dir=root+'node_modules/'+name+'/';
   const meta=JSON.parse(await readFile(dir+'package.json','utf8')),files=await readdir(dir);
   const license=files.find(f=>/^licen[sc]e(?:\.|$)/i.test(f))??files.find(f=>/^readme/i.test(f));

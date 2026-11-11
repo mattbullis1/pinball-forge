@@ -1,10 +1,11 @@
 import './player.css';
+import {tableSize} from './model';
 import {advancedStatus} from './game-rules';
 import {readGamePackage} from './game-package';
 import {createGame,Game} from './physics';
 import {drawBackground,drawTable} from './draw';
 import {ArtworkLayers,checkArtwork} from './artwork';
-import {FlipperInput} from './play-input';
+import {bindMouseFlippers,FlipperInput} from './play-input';
 import {GameAudio} from './game-audio';
 import {measureRender,measureSimulation} from './diagnostics';
 import {syncPicture} from './pictures';
@@ -15,10 +16,11 @@ async function boot(){
  const root=document.querySelector<HTMLElement>('#player')!;
  root.innerHTML=`<header><p class="brand">PINBALL FORGE</p><h1 id="title"></h1><button id="fullscreen">Fullscreen</button></header>
  <main class="layout"><section class="stage" aria-label="Pinball game"><div class="board"><canvas id="background" width="560" height="840" aria-hidden="true"></canvas><img id="table-picture-image" class="table-picture-image" alt="" hidden><div class="art-layer" id="art-back" aria-hidden="true"></div><canvas id="canvas" width="560" height="840" tabindex="0" aria-label="Pinball playfield"></canvas><div class="art-layer" id="art-front" aria-hidden="true"></div>
- <section class="overlay" id="welcome" aria-label="Title screen"><p class="eyebrow">YOUR PINBALL GAME</p><h2 id="welcome-title"></h2><button id="play" class="primary">Play</button><p>Left Shift · Right Shift<br>Space to launch</p><p class="small">Or use the touch buttons below.</p></section>
+ <section class="overlay" id="welcome" aria-label="Title screen"><p class="eyebrow">YOUR PINBALL GAME</p><h2 id="welcome-title"></h2><button id="play" class="primary">Play</button><p>Left / right mouse buttons or Shift keys<br>Space to launch</p><p class="small">Or use the touch buttons below.</p></section>
  <section class="overlay" id="gameover" aria-label="Game over" hidden><h2>GAME OVER</h2><p>FINAL SCORE</p><output id="final-score">0</output><button id="play-again" class="primary">Play again</button></section></div>
  <div id="touch-play" aria-label="Touch controls"><button id="left" disabled>Left flipper</button><button id="launch" disabled>Launch</button><button id="right" disabled>Right flipper</button></div></section>
- <aside id="scoreboard" aria-label="Scoreboard"><img id="headboard-picture-image" class="headboard-picture-image" alt="" hidden><div class="readout"><p>SCORE</p><output id="score">00000000</output><p>BALLS REMAINING</p><output id="balls">● ● ●</output></div><p id="advanced-status" role="status"></p><p id="game-state" role="status">Ready to play</p><button id="pause" disabled>Pause</button><button id="restart" disabled>Restart</button><label class="sound"><input id="sound" type="checkbox" checked> Sound</label><p class="small">Left Shift / Right Shift: flippers<br>Space: launch<br>Three balls. Make them count.</p></aside></main><footer><span id="message" role="status"></span><span>Made with PINBALL FORGE</span></footer>`;
+ <aside id="scoreboard" aria-label="Scoreboard"><img id="headboard-picture-image" class="headboard-picture-image" alt="" hidden><div class="readout"><p>SCORE</p><output id="score">00000000</output><p>BALLS REMAINING</p><output id="balls">● ● ●</output></div><p id="advanced-status" role="status"></p><p id="game-state" role="status">Ready to play</p><button id="pause" disabled>Pause</button><button id="restart" disabled>Restart</button><label class="sound"><input id="sound" type="checkbox" checked> Sound</label><p class="small">Left / right mouse buttons or Shift keys: flippers<br>Space: launch<br>Three balls. Make them count.</p></aside></main><footer><span id="message" role="status"></span><span>Made with PINBALL FORGE</span></footer>`;
+ const size=tableSize(table);root.style.setProperty('--playfield-ratio',String(size.width/size.height));root.style.setProperty('--playfield-width',size.width+'px');
  root.classList.toggle('polished',table.theme==='polished');
  const $=<T extends HTMLElement=HTMLElement>(id:string)=>root.querySelector<T>('#'+id)!;
  const canvas=$<HTMLCanvasElement>('canvas'),ctx=canvas.getContext('2d')!;
@@ -32,6 +34,8 @@ async function boot(){
  artwork.sync(table,undefined,true);
  let game:Game|undefined,last=performance.now(),over=false;
  const input=new FlipperInput((left,right)=>game?.flippers(left,right));
+ bindMouseFlippers(canvas,input,()=>!!game,()=>{void audio.unlock()});
+ $('sound').addEventListener('change',()=>{if($<HTMLInputElement>('sound').checked)void audio.unlock();const state=game?.snapshot().state;audio.sync(!game||state==='paused'||state==='gameover')});
  const text=(id:string,value:string)=>{if($(id).textContent!==value)$(id).textContent=value};
  function render(){
   const started=performance.now();
@@ -55,7 +59,7 @@ async function boot(){
  $('play').addEventListener('click',start);$('play-again').addEventListener('click',start);$('restart').addEventListener('click',start);
  $('pause').addEventListener('click',()=>pause(game?.snapshot().state!=='paused'));
  for(const id of ['left','right','launch'] as const){const button=$<HTMLButtonElement>(id);
-  button.addEventListener('pointerdown',e=>{e.preventDefault();button.setPointerCapture(e.pointerId);if(id==='launch')game?.launch();else input.press('pointer-'+e.pointerId,id)});
+  button.addEventListener('pointerdown',e=>{e.preventDefault();void audio.unlock();button.setPointerCapture(e.pointerId);if(id==='launch')game?.launch();else input.press('pointer-'+e.pointerId,id)});
   const release=(e:PointerEvent)=>input.release('pointer-'+e.pointerId);
   button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('lostpointercapture',release);
   button.addEventListener('keydown',e=>{if(e.code!=='Space'&&e.code!=='Enter')return;e.preventDefault();e.stopPropagation();if(!e.repeat){if(id==='launch')game?.launch();else input.press('button-'+id,id)}});
@@ -64,6 +68,7 @@ async function boot(){
  }
  document.addEventListener('keydown',e=>{
   if(!game||(e.target as HTMLElement).matches('input,select,textarea'))return;
+  if(['ShiftLeft','ShiftRight','Space'].includes(e.code)&&!e.repeat)void audio.unlock();
   if(e.code==='ShiftLeft')input.press('key-left','left');if(e.code==='ShiftRight')input.press('key-right','right');
   if(e.code==='Space'&&!(e.target as HTMLElement).closest('button')){e.preventDefault();if(!e.repeat)game.launch()}
   if(e.code==='Escape'&&!document.fullscreenElement)pause(true);

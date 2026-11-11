@@ -1,0 +1,11 @@
+PINBALL FORGE — asset notice
+
+Application code and original generated/procedural project artwork are covered
+by the repository's MIT license.
+
+The classic component atlas is derived from a user-supplied Pinball Construction
+Set reference image (src/assets/construction-reference.gif). This third-party
+reference artwork is not covered by PINBALL FORGE's MIT license. Its original
+rights remain with its respective owner; this project grants no license to it.
+
+User-imported artwork and audio retain their original ownership and licensing.

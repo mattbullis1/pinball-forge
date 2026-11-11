@@ -1,5 +1,57 @@
 # Changelog
 
+## Catcher, pinball sounds and mouse flippers — 2026-11-02
+
+- The three-ball catcher releases all three balls below its base with no ejection impulse. Gravity makes them fall. Replacement balls after the first two captures still cost no lives.
+- Added pass-through contact sensing for green and legacy lights; rollover and bumper contacts now select distinct synthesized bell or solenoid sounds. Existing scoring and imported audio remain intact. Sound honors pause, mute and exit, and gameplay gestures can resume browser audio.
+- Left/right mouse buttons operate the corresponding flippers on the playfield, including simultaneous holds and releases outside the board. Keyboard and touch remain independent. The same controls and sounds work in exported games.
+- Verification: 156 tests across 13 files, production build, actual Chromium mouse/touch/keyboard controls and audio output in editor and standalone ZIP. See `docs/GAMEPLAY-FIXES.md`.
+
+## Wall point editing — 2026-10-31
+
+- Corrected the existing Move and Stretch (arrow) controls: point handles take precedence over whole-part motion, and Stretch projects new points onto the selected segment without shifting its outline. Connected endpoints follow the selected joint; all other joints stay fixed.
+- Added explicit optional joint identifiers for stretched interior walls, including coincident but separate points. Legacy tables remain valid without migration. Duplicated segments keep independent connections.
+- Restored the reference Box choice using the existing polygon/point architecture as a detached hollow wall loop. Its four corners and inserted points reshape independently, with matching solid edge collisions and an open interior.
+- Active points have a visible highlight; geometry and picture clipping update during dragging. Existing undo/redo, saves and standalone export retain the edits.
+- 130 tests and build passed. Browser checks cover mouse/touch dragging, zigzags, independent boxes, boundary isolation, save/open, undo/redo and exported gameplay. See `docs/wall-editing-check.json` and `docs/wall-editing-tablet.png`.
+
+## Reference playfield proportions — 2026-10-27
+
+- New tables now use 616 × 768 world units, matching the reference's 308 × 384 playfield and the existing component sprite scale. Refined the stepped outline, bottom border and open drain.
+- Editor drawing, touch coordinates, collisions, drains, area paint, imported pictures/artwork and exported games share the table's dimensions. Corrected the standalone player's fixed CSS aspect ratio.
+- Older saved projects and sample tables retain their 560 × 840 geometry. No forced conversion or rearrangement of existing parts.
+- Preserved the header, tool/color column and headboard design. No dependencies, servers or network settings changed.
+
+## Annotated pieces and tools — 2026-10-27
+
+- Added the nine newly identified reference choices: two flashing rebound walls, three-ball trap, black hole, spinner and four one-way gates. The palette now contains 42 identified pieces.
+- The trap serves replacements without losing lives after captures one and two; capture three releases all three balls. Black holes drain a ball. The spinner turns top-to-bottom and scores crossings. Gate directions work independently for each ball.
+- Applied the user's annotated tool instructions: arrow reshapes edges/corners; scissors split barriers; hammer removes pieces; brush paints attached walls and bounded surface areas. Mouse cursors show the selected tool. Undo restores edits.
+- Added Gravity and Save controls using the existing table dialog and browser storage. Gravity and area colors persist in editable projects and standalone games. Existing projects keep the original gravity.
+- Header, headboard, color controls and column styling remain intact. Tool functions/icons were changed only as specified by the latest annotation. No server, network or dependency changes.
+- Unidentified square/controls remain unassigned; pixel editing is deferred as requested. Reference board proportions are still narrower than the original, and physical-tablet verification remains outstanding.
+
+## Reference artwork and confirmed behaviors — 2026-10-27
+
+- Replaced the remaining substitute icons with 33 identified pieces using the supplied GIF's artwork and arrangement. Shared outlines keep flippers, targets, slingshots and bumpers aligned with collision geometry.
+- Added the user-confirmed upward spring, two-way sideways spring, starting plunger, and nine bottom-row rollover lights. Rollovers award the adjustable score on entry without blocking the ball.
+- Removed the generic drain/diamond palette choices and unrelated animated spacecraft, energy field and beacon generators. User artwork imports and older saved-table rendering remain available.
+- Corrected new guide rails to white, their reference orientations, and placement near the table edge. Refined the empty green perimeter.
+- Preserved the header, right tools/color column and headboard. No server/network changes or dependency installations.
+- Outstanding: functions of square/rails/U/ring/equals/arrows, playfield aspect ratio, and physical-tablet confirmation. This is not a complete visual reproduction.
+
+## Reference palette cleanup — 2026-10-27
+
+- Reduced the main palette from 31 to 19 choices: removed generic blocks/wedges/posts, duplicate color variants, the scoring-zone token, and placeholder drop-target/spinner buttons.
+- Removed the Advanced parts tray, its sample injection button, and unused drag handlers/styles. Rules, missions, audio, and saved-table compatibility remain.
+- No physics, server, network, header, tool/color-column, or headboard changes in this cleanup.
+
+## Tablet parts-box follow-up (2026-10-26)
+
+- Added eight compact wall, post, wedge, bumper, and light choices to the construction palette; the tablet palette now has five columns.
+- Made a piece follow the pointer during placement and highlighted the table when it is a valid drop destination. A tap on a part followed by a tap on the table remains available.
+- Kept the established header, pop-in menus, and far-right tool/color column in place.
+
 ## Modern graphics and two-picture layout (2026-10-26)
 
 - Moved the editor headboard preview to the left and expanded the right parts box to five columns, while preserving the locked header, colors and pop-in menus.

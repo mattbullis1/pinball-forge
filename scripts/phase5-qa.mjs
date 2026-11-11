@@ -5,7 +5,7 @@ import {resolve,dirname} from 'node:path';
 import JSZip from 'jszip';
 import {buildPlayer} from './build-player.mjs';
 await mkdir('.qa',{recursive:true});
-await build({stdin:{contents:"export {workshopTable} from './src/workshop';export {makePart,newTable,fromPreset} from './src/model';export {createGameZip} from './src/export-game';",resolveDir:process.cwd()},bundle:true,platform:'node',format:'esm',packages:'external',outfile:'.qa/phase5-api.mjs'});
+await build({stdin:{contents:"export {workshopTable} from './src/workshop';export {makePart,newTable,fromPreset} from './src/model';export {createGameZip} from './src/export-game';",resolveDir:process.cwd()},bundle:true,platform:'node',format:'esm',packages:'external',loader:{'.png':'dataurl','.gif':'dataurl'},outfile:'.qa/phase5-api.mjs'});
 const {workshopTable,makePart,newTable,fromPreset,createGameZip}=await import('../.qa/phase5-api.mjs?'+Date.now());
 const bundle=await buildPlayer(),workshop=workshopTable();
 await writeFile('examples/forge-workshop.pinball.json',JSON.stringify(workshop,null,2));
