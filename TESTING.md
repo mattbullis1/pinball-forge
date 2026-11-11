@@ -8,10 +8,9 @@
 
 - `npm.cmd test -- --run`: 130 passing tests across 12 files. Twelve new wall regressions exercise insertion, fixed neighboring points, separate/overlapping joints, independent rectangular loops, rotated/scaled edits, legacy compatibility, save/undo history, hollow-box collisions and rebound at an edited joint.
 - `npm.cmd run build`: passes type checking and production bundling. Existing large-bundle warning remains.
-- `node .qa/wall-editing-check.cjs`: passes against the restored `private-preview` preview using an isolated Chromium context. Mouse and emulated touch drags, live canvas updates, active-point highlight, detached box shaping, a three-point zigzag, outer boundary isolation, JSON and browser save/open, undo/redo, and exported ZIP playback all pass with no page errors. No edits were made to Matt's browser storage.
+- `node .qa/wall-editing-check.cjs`: passes against the restored `the local test environment` preview using an isolated Chromium context. Mouse and emulated touch drags, live canvas updates, active-point highlight, detached box shaping, a three-point zigzag, outer boundary isolation, JSON and browser save/open, undo/redo, and exported ZIP playback all pass with no page errors.
 - Rendered screenshots reviewed at desktop and 800-pixel tablet width: `docs/wall-editing-desktop.png`, `docs/wall-editing-tablet.png`; exported player: `docs/wall-editing-player.png`. Machine-readable result: `docs/wall-editing-check.json`. Physical-tablet verification remains outstanding for this repair.
 - Header, headboard, tool/color column layout and all unrelated parts retain the approved design. Existing arrow and hand control slots now describe Stretch and Move; the reference Box fills its original palette position.
-- Network verification: `example.test:8080` and restored `example.test:5173` respond with HTTP 200. Restarted the completed project's existing IPv4 preview on port 5173; no hostname, proxy, web server, firewall or authentication configuration changed. A separate old Phase 1 checkout listens on IPv6 loopback port 5173 and was left running.
 
 ## Playfield proportion correction — 2026-10-27
 
@@ -29,7 +28,7 @@ Physical-device touch input is still unverified. Unidentified controls remain un
 
 114 unit/physics tests pass; production build passes. Tests cover all three trap captures and replacement lives, rotated traps, multiball gates from opposite directions, black-hole drains, spinner motion, rebound flash, combo mission points, barrier splitting, edge shaping, connected paint, gravity and data validation.
 
-Browser checks at private-preview placed all 42 choices using touch input and verified undo/redo, identical editing data after Test, project import/export and an exported player opened from disk. Additional tool workflows verify scissors, edge dragging, hammer/undo, connected-wall paint, separate colors in enclosed surface regions, gravity persistence, toolbar Save/Open, and painted regions in the standalone player. No browser errors. A 60-sample local browser measurement of the painted background averaged 6.26 ms, with p95 8 ms; it is not redrawn during play. The split-point assertion allows browser coordinate rounding; production coordinates are not rounded by the cutter.
+Browser checks at the local test environment placed all 42 choices using touch input and verified undo/redo, identical editing data after Test, project import/export and an exported player opened from disk. Additional tool workflows verify scissors, edge dragging, hammer/undo, connected-wall paint, separate colors in enclosed surface regions, gravity persistence, toolbar Save/Open, and painted regions in the standalone player. No browser errors. A 60-sample local browser measurement of the painted background averaged 6.26 ms, with p95 8 ms; it is not redrawn during play. The split-point assertion allows browser coordinate rounding; production coordinates are not rounded by the cutter.
 
 Header, headboard and color-control markup match the earlier approved checkpoint. The new annotation explicitly authorizes the tool function/icon changes; column CSS is unchanged. Actual desktop and 800px tablet-layout screenshots were inspected: docs/annotated-reference-editor.png, docs/annotated-reference-parts.png, docs/annotated-reference-player.png, docs/annotated-tools-editor.png and docs/annotated-tools-tablet.png. Reports: docs/annotated-reference-check.json and docs/annotated-tools-check.json.
 
@@ -56,7 +55,7 @@ The added eight presets are validated at an interior placement point; short and 
 
 `npm.cmd test`: **86 tests passed** in nine files. `npm.cmd run build`: TypeScript and Vite passed. New checks validate two independent picture references and fit modes, reject broken references, verify their exact bytes in the ZIP, and verify the polished component atlas in standalone output. `scripts/modern-qa.mjs` generated an independent **9-file, 7,864,492-byte** ZIP with **28 parts and two uploaded picture assets**; its CRC/inventory check passed.
 
-In the actual Chrome editor at `private-preview`, uploaded the sample table and headboard PNGs through their visible native file inputs, observed each preview and enabled fit/remove controls, then selected Polished appearance. The resulting screenshot is `docs/modern-editor-actual.png`: headboard left, full table, five-column palette right, locked top and right tools intact. An independently served package at `private-preview` loaded the same pictures and modern parts with the headboard right; screenshot `docs/modern-game-actual.png`.
+In the actual Chrome editor in the local test environment, uploaded the sample table and headboard PNGs through their visible native file inputs, observed each preview and enabled fit/remove controls, then selected Polished appearance. The resulting screenshot is `docs/modern-editor-actual.png`: headboard left, full table, five-column palette right, locked top and right tools intact. An independently served package in the local test environment loaded the same pictures and modern parts with the headboard right; screenshot `docs/modern-game-actual.png`.
 
 The original photos supplied by the user were used as proportion references, not pixel-perfect copying. Direct `file://`, a separate tablet device, and Firefox/Safari remain unverified. The editor production bundle is 3.23 MB of JavaScript (2.24 MB gzip) because it embeds the atlas for client-side ZIP export; reducing this cost is a remaining performance improvement.
 
@@ -64,7 +63,7 @@ The original photos supplied by the user were used as proportion references, not
 
 **65 tests pass** across seven files; TypeScript and Vite production build pass. Added ZIP CRC/inventory checks, exact original-image preservation, generated-path validation, escaping, three sample runtime-equivalence checks, actual player build/no-network-API checks, real artwork fixtures and editor-license packaging.
 
-The browser-generated Classic ZIP was finalized by the user, found in Downloads, CRC-checked and tested independently through web server. Four table packages were tested, including all supported image/animation formats, scoring, drains, game over, restart, pause and fullscreen. Chrome viewport tests covered tablet and narrow layouts. See [Phase 4 acceptance evidence](docs/PHASE4.md) for exact counts, screenshots, performance readings and limits.
+The browser-generated Classic ZIP was finalized by the user, found in Downloads, CRC-checked and tested independently through static web server. Four table packages were tested, including all supported image/animation formats, scoring, drains, game over, restart, pause and fullscreen. Chrome viewport tests covered tablet and narrow layouts. See [Phase 4 acceptance evidence](docs/PHASE4.md) for exact counts, screenshots, performance readings and limits.
 
 Direct file:// opening was blocked by browser tooling and was not bypassed. No physical network-disconnection or separate-device test was performed. Automated bundle/resource checks establish no external runtime dependencies; independent local HTTP playback was verified.
 
@@ -83,7 +82,7 @@ Direct file:// opening was blocked by browser tooling and was not bypassed. No p
 
 ### Browser verification
 
-On the actual example.test preview in the in-app Chromium browser:
+On the actual local development preview in the in-app Chromium browser:
 
 - Played Classic Builder and animated Star Workshop; observed 100-point scoring, draining and the next ball waiting to launch.
 - Confirmed ShiftLeft, ShiftRight and Space key events reach the game. Pointer Launch worked; launch disables during active play.
@@ -99,7 +98,7 @@ Run node tests/measure-physics.mjs to repeat the simulation-only CPU measurement
 
 One mixed-playtest browser diagnostic window, ending on Star Workshop, measured 1.90 ms p95 simulation work per rendered frame, 0.90 ms p95 rendering and approximately 9 MB JS heap. It also recorded 82 pauses longer than 500 ms under browser automation/occlusion, so it does **not** establish a stable interactive frame rate. Heap excludes native image/GPU allocations. Physical tablet input, another network device, Firefox/Safari and large custom tables remain unverified.
 
-This is an arcade model with fixed substeps and bounded speeds, not exact continuous collision detection or electromechanical pinball. The future standalone player must reuse physics.ts and its lifecycle rules; ZIP/export parity belongs to Phase 4. Network configuration and existing web server sites are unchanged.
+This is an arcade model with fixed substeps and bounded speeds, not exact continuous collision detection or electromechanical pinball. The future standalone player must reuse physics.ts and its lifecycle rules; ZIP/export parity belongs to Phase 4. Network configuration and existing static web server sites are unchanged.
 
 ## Phase 2 verification — 2026-10-25
 
@@ -107,7 +106,7 @@ This is an arcade model with fixed substeps and bounded speeds, not exact contin
 
 ### Actual browser workflows
 
-Executed through browser controls on example.test, in the in-app Chromium browser and Chrome:
+Executed through browser controls in the editor, in the in-app Chromium browser and Chrome:
 
 - Imported 7 image files: 6 valid files processed and placed; 1 deliberately invalid GIF reported. Valid cases: transparent PNG, JPG, static WebP, animated GIF, animated WebP, and a PNG sprite sheet.
 - Imported 4 more PNG files as one frame sequence: 4 processed, 1 animation placed.
@@ -154,7 +153,7 @@ Standalone HTML5 ZIP and offline exported-game animation checks remain Phase 4. 
 
 ## Browser checks — 2026-10-25
 
-Executed on the actual example.test:5173 page using browser automation:
+Executed in the editor using browser automation:
 
 - Add an outer-wall corner, drag it, undo, redo, and remove it.
 - Drag a solid obstacle from the palette, paint it orange, reshape a corner, change rotation and size.
@@ -167,9 +166,8 @@ Executed on the actual example.test:5173 page using browser automation:
 
 These browser checks used the browser-control tool, not a committed Playwright regression suite. Physical tablet input and access from a separate network device remain unverified.
 
-## Environment and remaining gates
+## Remaining gates
 
-Verified example.test resolved to development machine's private address. Existing web server AOV returned HTTP 200. No DNS, hosts, firewall, Apache, authentication, or network settings changed.
 
 Remaining gates: broad browser/device coverage, physically disconnected-network and direct-file verification, large-asset stress tests, and device-specific physics tuning. Phase 4 ZIP and independent local HTTP evidence are recorded above.
 

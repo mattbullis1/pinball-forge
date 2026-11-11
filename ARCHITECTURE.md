@@ -6,7 +6,7 @@
 - `pictures.css` lays out the editor with the headboard at left and reference-positioned component buttons. The player keeps its sign and scoreboard on the right. The locked top navigation, color/tool strip, and property drawers are untouched.
 - `modern-parts.ts` draws original raster sprites for flippers, ball, bumpers, slingshots, target, and light. `polished.ts` draws metallic walls, adjustable solid shapes, drain, and launcher. Geometry and Matter.js bodies remain shared with Classic.
 - `src/assets/modern-parts.png` is the authored source atlas, `public/modern-parts.png` serves the static editor, and `export-game.ts` includes the same bytes in each polished standalone ZIP. The exported runtime resolves its atlas and both user pictures by relative paths, without an editor or CDN.
-- `scripts/modern-qa.mjs` makes a self-contained sample and independent ZIP for local HTTP verification. Its web server QA output is separate from existing sites and does not require server configuration changes.
+- `scripts/modern-qa.mjs` makes a self-contained sample and independent ZIP for local HTTP verification. Its QA output is written to an isolated test directory.
 
 - `main.ts` loads `editor.ts`, which manages DOM controls, pointer interaction, painting, play/edit transitions, and persistence.
 - `model.ts` defines serializable components, 28 working palette presets, three sample tables, and import validation. Valid older segment-based tables remain readable; exterior color is optional for compatibility.
@@ -24,7 +24,7 @@ The runtime owns serving/launch eligibility, three-ball drains, restart, pause, 
 
 ## Persistence and deployment
 
-Projects use IndexedDB for one browser save, with read-only fallback to the earlier localStorage save. JSON interchange embeds raster image bytes as data URLs. Vite emits static files with relative paths. Development access is through example.test on port 5173; web server and all existing sites remain unchanged.
+Projects use IndexedDB for one browser save, with read-only fallback to the earlier localStorage save. JSON interchange embeds raster image bytes as data URLs. Vite emits static files with relative paths. Development hostnames are supplied through an ignored local environment file.
 
 The standalone player consumes the same model, geometry, renderer and rules through a separate bundled entry point. Community hosting and backend services remain outside this revision.
 

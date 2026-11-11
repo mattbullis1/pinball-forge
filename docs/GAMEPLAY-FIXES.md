@@ -1,6 +1,6 @@
 # Gameplay fixes — November 2, 2026
 
-Verified preview: private-preview (HTTP 200).
+The local preview returned HTTP 200 during verification.
 
 ## Changes
 

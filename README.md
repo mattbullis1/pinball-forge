@@ -4,7 +4,7 @@
 
 Build a table, choose **Test**, then use the left/right mouse buttons or Shift keys for the flippers and Space to launch. Touch controls are included. **Save** stores a project in this browser; **Project ↓** downloads an editable backup; **DOWNLOAD MY PINBALL GAME** creates a standalone playable ZIP.
 
-This is an early release. Keep a project-file backup while experimenting. Browser saves belong to the device and website address where they were created; opening the public site does not transfer a table saved on development machine. Import the downloaded project file to move it.
+This is an early release. Keep a project-file backup while experimenting. Browser saves belong to the device and website address where they were created; opening the public site does not transfer a table saved at another address. Import the downloaded project file to move it.
 
 Latest fixes include independent wall points, Stretch insertion, editable Box walls, the three-ball catcher drop, and pinball sounds. See [alpha release notes](docs/ALPHA-RELEASE.md) and [asset/license information](LICENSES.md).
 
@@ -18,11 +18,13 @@ See the [actual editor](docs/modern-editor-actual.png) and [standalone game](doc
 
 A browser construction set inspired by Bill Budge's Apple II workbench: table on the left, parts box on the right, and direct manipulation with a mouse or touch. The faithful workbench includes artwork, animation, refined playtesting and standalone HTML5 ZIP export. Later roadmap phases remain separate approval gates.
 
-## Run on development machine
+## Development
 
-From this directory run `npm.cmd install`, then `npm.cmd run dev`. The preview is served at `private-preview` while Vite is running. The explicit alternative is `node node_modules/vite/bin/vite.js --host 0.0.0.0 --port 5173 --strictPort`.
+Install the dependencies with `npm install`, then run `npm run dev`. On Windows PowerShell use `npm.cmd` instead of `npm`. Open the preview address printed by the development server.
 
-`npm.cmd run build` creates relative-path static files in `dist/`. `npm.cmd test` runs the construction and physics tests. web server configuration and existing sites remain unchanged. Extracted export examples are tested in a separate local QA folder under the existing webroot. The current alpha is published at https://pinball.mattbullis.com/.
+For a custom development hostname, copy `.env.example` to the ignored `.env.local` file and set `PINBALL_DEV_ALLOWED_HOSTS`. Keep machine-specific settings out of version control.
+
+`npm run build` creates static files in `dist/`; `npm test` runs the automated tests. The public alpha is at https://pinball.mattbullis.com/.
 
 ## Build a table
 
@@ -70,7 +72,7 @@ Native GIF/WebP timing is controlled by the browser; frame-specific gameplay syn
 3. Extract the entire ZIP into its own folder. Keep all files and the assets directory together.
 4. Serve that folder through any ordinary static web server and open index.html. All paths are relative; no editor, CDN or API is needed. Direct file opening may work, but file:// was blocked by our test tooling and is not verified.
 5. Choose Play. Use Shift keys or the touch buttons, Space/Launch, Pause, Restart and Fullscreen.
-6. To publish on hosting you control, upload all extracted contents into one directory, preserving filenames. Keep LICENSES.txt and any notices required by imported artwork. Publishing is a user action; this project has not been publicly deployed.
+6. To publish on hosting you control, upload all extracted contents into one directory, preserving filenames. Keep LICENSES.txt and any notices required by imported artwork. The construction set itself is available at the public alpha link above.
 
 The ZIP includes images, animation settings, the physics engine, shared game rules, locally synthesized sounds and imported audio. Keep **Project ↓** backups to continue editing. See [Phase 4 verification and limits](docs/PHASE4.md).
 

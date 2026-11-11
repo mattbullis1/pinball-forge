@@ -5,7 +5,7 @@
     "audio": 2,
     "files": 8,
     "bytes": 118078,
-    "folder": "[private-path]"
+    "folder": "forge-workshop"
   },
   {
     "title": "Rule Circuit",
@@ -13,6 +13,6 @@
     "audio": 2,
     "files": 8,
     "bytes": 117444,
-    "folder": "[private-path]"
+    "folder": "rule-circuit"
   }
 ]

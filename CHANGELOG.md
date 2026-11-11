@@ -58,7 +58,7 @@
 - Added separate native file controls for a playfield background and a headboard sign, with fit/remove options; pictures save in projects and ship in standalone ZIPs.
 - Added original nebula and headboard examples plus a transparent chrome component atlas. Polished walls, obstacles, launcher and drain use matching metallic rendering.
 - Reduced new bumper presets while preserving the dimensions of previously saved tables. The table scales to fit the editor's screen height; the standalone game keeps its headboard on the right.
-- Checked actual editor imports and an independent exported game through example.test. No web server or network configuration changed.
+- Checked actual editor imports and an independent exported game in the local test environment.
 
 ## 0.1.0 — Phase 1 preview
 
@@ -78,7 +78,6 @@
 - Added side scoreboard, Back to Build, restart, default hit sound/flash, and fixed 120 Hz stepping; all placed flippers respond.
 - Added browser-save/file-open choices and stronger project validation.
 - Verified 21 tests, production build, and browser workflows. Exported data stayed byte-identical across Test.
-- Preserved web server/example.test configuration. No deployment performed.
 - Later phases, including standalone ZIP and imported animation, remain pending.
 
 ## 0.3.0 — Artwork and animation (2026-10-25)
@@ -101,7 +100,7 @@
 - Added Pause/Resume and automatic pause on focus loss, plus independent keyboard/touch input sources.
 - Verified 51 automated checks, four 30-second simulation runs, real browser scoring/drain/restart/pause workflows and byte-identical animated-project preservation.
 - Recorded simulation CPU measurements and browser diagnostics. Physical tablet, Firefox/Safari, arbitrary extreme layouts and standalone player verification remain future checks.
-- No dependencies added, no deployment, and no web server or example.test configuration changes.
+- No dependencies added.
 
 ## 0.5.0 — Standalone HTML5 export (2026-10-26)
 
@@ -112,7 +111,7 @@
 - Included runtime licenses and hosting instructions in each ZIP; editor builds include dependency notices.
 - Verified 65 tests, build, four standalone packages, the user's finalized browser download, Chrome tablet/narrow layouts and animation evidence.
 - Direct file:// was blocked by test tooling; physically disconnected Internet and physical tablet tests remain unverified.
-- Added isolated local web server export QA files without changing server/network settings or existing sites. Phase 5 remains gated.
+- Added isolated local static web server export QA files without changing server/network settings or existing sites. Phase 5 remains gated.
 
 
 ## 0.6.0 — Phase 5 optional workshop (2026-10-26)

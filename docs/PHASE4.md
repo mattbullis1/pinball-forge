@@ -28,8 +28,8 @@ Sounds are synthesized locally, so no separate audio files are necessary. Export
 - Three sample tables produce identical simulation snapshots before and after ZIP packaging for 1,200 fixed ticks each.
 - Four independent packages generated: Classic Builder (6 files, no images), Star Workshop (9 files, 3 images), Artwork Laboratory (19 files, 13 images), Drain and Restart Check (6 files, no images).
 - All 16 images across Star Workshop and the laboratory compare byte-for-byte with their source assets. CRC validation passes. See phase4-packages.json.
-- Browser download initially remained unconfirmed. The user completed the browser handoff and confirmed success. [private-path] was found, CRC-checked, extracted and opened independently. Its five non-table files exactly match the tested package; table settings match apart from generated object IDs. See phase4-browser-download.json.
-- Local HTTP playback verified through existing web server in an isolated pinball-forge-export-qa/20261026 directory. Title/Play, launch, 100-point scoring, drains, pause/resume, restart, three-ball game-over and fullscreen transitions were observed.
+- Browser download initially remained unconfirmed. The user completed the browser handoff and confirmed success. classic-builder.zip was found, CRC-checked, extracted and opened independently. Its five non-table files exactly match the tested package; table settings match apart from generated object IDs. See phase4-browser-download.json.
+- Local HTTP playback verified through existing static web server in an isolated pinball-forge-export-qa/20261026 directory. Title/Play, launch, 100-point scoring, drains, pause/resume, restart, three-ball game-over and fullscreen transitions were observed.
 - Original GIF and animated WebP, sheet frames and frame sequences loaded in the exported laboratory. Two screenshots show different animation frames. No image URLs point back to the editor.
 - Chrome tablet viewport: width 768 without horizontal overflow. Narrow viewport: content width 375 without horizontal overflow, touch buttons 44 pixels tall. This is viewport emulation, not a physical tablet test.
 - Browser logs checked on the standalone Chrome player returned no errors or warnings.
@@ -43,13 +43,6 @@ A physically disconnected-network run was not performed. Direct file:// navigati
 
 The browser may hold ZIP downloads for review; the application cannot override that decision. Firefox, Safari, physical tablet input and access from another network device remain unverified. Audio is the shared synthesized implementation; audible output was not independently captured. Native animated-image timing and fullscreen availability depend on the browser.
 
-No web server, DNS, hosts, firewall, mDNS, example.test or existing site configuration changed. AOV continued to return HTTP 200. No public deployment took place.
-
-## Review links on development machine
-
-- Editor: private-preview
-- Exact downloaded game: private-preview
-- Animated example: private-preview
 
 ## Evidence files
 
@@ -60,7 +53,3 @@ No web server, DNS, hosts, firewall, mDNS, example.test or existing site configu
 - phase4-browser-download.json
 - phase4-packages.json
 - phase4-performance.json
-
-## Updated local toolchain guidance
-
-Read the gamedev-tools skill, permanent memory, framework selection, installed inventory and command guide during final verification. This existing approved Canvas/Matter.js project retains its pinned toolchain; no starter replacement or framework reinstall was needed. Commands use npm.cmd on Windows. The dedicated development machine MCP server was not exposed; available terminal and browser controls were used. Browser checks used the permitted CUA browser surface; the separate installed Playwright smoke harness was not run.
